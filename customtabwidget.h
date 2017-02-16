@@ -30,7 +30,7 @@ private:
     QRect mDragIndicator = QRect();
     const int mIndicatorMargin = 10;
     enum Area {
-        TOP, RIGHT, BOTTOM, MIDDLE, LEFT, INVALID
+        TOP, RIGHT, BOTTOM, LEFT, INVALID
     };
     Area mIndicatorArea = Area::INVALID;
 };

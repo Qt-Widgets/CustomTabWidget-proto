@@ -33,33 +33,35 @@ void TabWidget::dragMoveEvent(QDragMoveEvent* event) {
         return;
     }
 
-    //calculate what area the mouse cursor is in.
-    int left = rect().left();
-    int top = rect().top();
-    int width = rect().width();
-    int height = rect().height();
-    int marginX = width * 0.4;
-    int marginY = height * 0.4;
-
     QPoint p = mapFromGlobal(QCursor::pos());
-
     if (!rect().contains(p)) {
         //mouse not inside the widget
         return;
     }
 
+    //calculate what area the mouse cursor is in.
+    int left = rect().left();
+    int top = rect().top();
+    int width = rect().width();
+    int height = rect().height();
+    int marginX = width * 0.5;
+    int marginY = height * 0.3;
+
     bool topArea = (top + marginY > p.y());
     bool bottomArea = (height - marginY < p.y());
+    bool rightArea = (marginX < p.x());
+    bool leftArea = (marginX > p.x());
 
     if (topArea) {
         mIndicatorArea = Area::TOP;
-        update();
     } else if (bottomArea) {
         mIndicatorArea = Area::BOTTOM;
-        update();
-    } else {
+    } else if (rightArea) {
         mIndicatorArea = Area::RIGHT;
+    } else if (leftArea) {
+        mIndicatorArea = Area::LEFT;
     }
+    update();
 }
 
 void TabWidget::dragEnterEvent(QDragEnterEvent* event) {
@@ -85,6 +87,8 @@ void TabWidget::dragLeaveEvent(QDragLeaveEvent*) {
 void TabWidget::dropEvent(QDropEvent *event) {
     if (event->source() == this) {
         qDebug() << "dropping on it self. There should be a index move operation here.";
+        mDragIndicator = QRect();
+        update();
         return;
     }
 
@@ -126,14 +130,18 @@ void TabWidget::drawIndicator() {
         QPainter painter(this);
         painter.setPen(QPen(QBrush(Qt::blue), 3, Qt::DashLine));
 
-        //int marginX = width * 0.25;
-        int marginY = mDragIndicator.height() * 0.4;
         QRect rect = mDragIndicator;
+        int marginY = rect.height() * 0.4;
+        int marginX = rect.width() * 0.4;
 
         if (mIndicatorArea == Area::TOP) {
             rect.setBottom(marginY);
         } else if (mIndicatorArea == Area::BOTTOM) {
             rect.setTop(rect.bottom() - marginY);
+        } else if (mIndicatorArea == Area::RIGHT) {
+            rect.setLeft(rect.right() - marginX);
+        } else if (mIndicatorArea == Area::LEFT) {
+            rect.setRight(rect.left() + marginX);
         }
 
         painter.drawRect(rect);
