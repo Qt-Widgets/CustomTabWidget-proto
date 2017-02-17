@@ -7,6 +7,7 @@
 #include <QWindow>
 
 static QString sourceIndexMimeDataKey() { return QStringLiteral("source/index"); }
+static QString sourceTabTitleMimeDataKey() { return QStringLiteral("source/tabtitle"); }
 
 TabWidget::TabWidget(QWidget *parent) : QTabWidget(parent) {
     mDrawOverlay = new DrawOverlay(this);
@@ -90,19 +91,20 @@ void TabWidget::dragLeaveEvent(QDragLeaveEvent* /*event*/) {
 }
 
 void TabWidget::dropEvent(QDropEvent *event) {
-    if (event->source() == this) {
-        qDebug() << "dropping on it self. There should be a index move operation here.";
-        mDrawOverlay->setRect(QRect());
-        return;
-    }
-
     const QMimeData *mime = event->mimeData();
     if (mime->hasText()) {
-        int index = mime->data(sourceIndexMimeDataKey()).toInt();
+        int sourceIndex = mime->data(sourceIndexMimeDataKey()).toInt();
+        QString tabTitle = QString::fromStdString(mime->data(sourceTabTitleMimeDataKey()).toStdString());
         QTabWidget* sourceTabWidget = static_cast<QTabWidget*>(event->source());
-        QWidget* widget = sourceTabWidget->widget(index);
+        QWidget* widget = sourceTabWidget->widget(sourceIndex);
 
-        this->addTab(widget, widget->objectName() + "_moved");
+        if (mIndicatorArea == Area::TABBAR) {
+            QPoint mousePos = tabBar()->mapFromGlobal(QCursor::pos());
+            int targetIndex = tabBar()->tabAt(mousePos);
+            insertTab(targetIndex, widget, tabTitle);
+        } else {
+            //todo: split dock widget and create a new custom dockwidget to corresponding area.
+        }
 
         event->acceptProposedAction();
     }
@@ -123,7 +125,7 @@ void TabWidget::mouseReleaseEvent(QMouseEvent */*event*/) {
 void TabWidget::resizeEvent(QResizeEvent* event) {
     QTabWidget::resizeEvent(event);
     if (mDrawOverlay) {
-        mDrawOverlay->setGeometry(rect());
+        mDrawOverlay->setGeometry(this->rect());
     }
 }
 
@@ -177,6 +179,7 @@ void TabWidget::on_tabBarClicked(int index) {
 
     QMimeData *mimeData = new QMimeData;
     mimeData->setText(tabWidget->objectName());
+    mimeData->setData(sourceTabTitleMimeDataKey(), QByteArray::fromStdString(tabText(index).toStdString()));
     mimeData->setData(sourceIndexMimeDataKey(), QByteArray::number(index));
 
     qreal dpr = window()->windowHandle()->devicePixelRatio();
