@@ -4,11 +4,21 @@
 #include <QGuiApplication>
 #include <customdockwidget.h>
 #include <QDebug>
+#include <assert.h>
+
+MainWindow* MainWindow::sInstance = nullptr;
+
+MainWindow* MainWindow::instance() {
+    return sInstance;
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+    assert(!sInstance); //another instance already exists!
+    sInstance = this;
+
     QApplication::setEffectEnabled(Qt::UI_AnimateMenu, false);
     QApplication::setEffectEnabled(Qt::UI_FadeMenu, false);
     QApplication::setEffectEnabled(Qt::UI_AnimateCombo, false);
@@ -22,8 +32,8 @@ MainWindow::MainWindow(QWidget *parent)
     setAnimated(false);
 
     //temp widgets
-    ui->horizontalLayout->addWidget(new customDockWidget(this), 1);
-    ui->horizontalLayout->addWidget(new customDockWidget(this), 1);
+    ui->centralLayout->addWidget(new customDockWidget(this), 1);
+    ui->centralLayout->addWidget(new customDockWidget(this), 1);
 }
 
 MainWindow::~MainWindow() {
@@ -32,7 +42,7 @@ MainWindow::~MainWindow() {
 
 void MainWindow::splitTabWidget(QWidget *source, QWidget *target, utils::DropArea dropArea) {
     //traverse layouts and find layout for the target widget. ui->horizontalLayout is the root of all layouts.
-    QBoxLayout* targetLayout = findWidgetLayout(target, ui->horizontalLayout);
+    QBoxLayout* targetLayout = findWidgetLayout(target, ui->centralLayout);
     if (!targetLayout) {
         qDebug() << "ERROR: Could not find layout for the widget.";
         return;
@@ -54,14 +64,17 @@ void MainWindow::splitTabWidget(QWidget *source, QWidget *target, utils::DropAre
 }
 
 QBoxLayout* MainWindow::findWidgetLayout(QWidget* target, QBoxLayout* targetLayout) {
-    for (int i = 0; i < targetLayout->children().size(); i++) {
-        QWidget* foundWidget = static_cast<QWidget*>(targetLayout->children().at(i));
-        if (foundWidget && foundWidget == target) {
-            return targetLayout;
+    for (int i = 0; i < targetLayout->count(); i++) {
+        customDockWidget* foundContainerWidget = static_cast<customDockWidget*>(targetLayout->itemAt(i)->widget());
+        if (foundContainerWidget) {
+            QWidget* foundTabWidget = foundContainerWidget->tabWidget();
+            if (foundTabWidget == target) {
+                return targetLayout;
+            }
         }
 
         //find all layouts recursively
-        QBoxLayout* foundLayout = static_cast<QBoxLayout*>(targetLayout->children().at(i));
+        QBoxLayout* foundLayout = static_cast<QBoxLayout*>(targetLayout->itemAt(i)->layout());
         if (foundLayout) {
             findWidgetLayout(target, foundLayout);
         }

@@ -11,6 +11,7 @@ class customDockWidget : public QDockWidget
 
 public:
     explicit customDockWidget(QWidget *parent = 0);
+    QWidget* tabWidget();
 
 private:
     TabWidget* mTabWidget;

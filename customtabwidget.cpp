@@ -73,16 +73,15 @@ void TabWidget::dropEvent(QDropEvent *event) {
         int sourceIndex = mime->data(sourceIndexMimeDataKey()).toInt();
         QString tabTitle = QString::fromStdString(mime->data(sourceTabTitleMimeDataKey()).toStdString());
         QTabWidget* sourceTabWidget = static_cast<QTabWidget*>(event->source());
-        QWidget* widget = sourceTabWidget->widget(sourceIndex);
+        QWidget* sourceWidget = sourceTabWidget->widget(sourceIndex);
 
         if (mIndicatorArea == utils::DropArea::TABBAR) {
             QPoint mousePos = tabBar()->mapFromGlobal(QCursor::pos());
             int targetIndex = tabBar()->tabAt(mousePos);
-            insertTab(targetIndex, widget, tabTitle);
+            insertTab(targetIndex, sourceWidget, tabTitle);
         } else {
             //todo: split dock widget and create a new custom dockwidget to corresponding area.
-            MainWindow* mainWindow = static_cast<MainWindow*>(topLevelWidget());
-            mainWindow->splitTabWidget(widget, this, mIndicatorArea);
+            MainWindow::instance()->splitTabWidget(sourceTabWidget, this, mIndicatorArea);
         }
 
         event->acceptProposedAction();

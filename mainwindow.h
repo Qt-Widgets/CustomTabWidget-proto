@@ -13,9 +13,15 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+private:
+    static MainWindow* sInstance;
+
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+public:
+    static MainWindow* instance();
 
     void splitTabWidget(QWidget* source, QWidget* target, utils::DropArea dropArea);
     QBoxLayout* findWidgetLayout(QWidget* target, QBoxLayout* targetLayout);

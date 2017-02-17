@@ -13,3 +13,7 @@ customDockWidget::customDockWidget(QWidget *parent)
 
     setWidget(mTabWidget);
 }
+
+QWidget *customDockWidget::tabWidget() {
+    return mTabWidget;
+}
