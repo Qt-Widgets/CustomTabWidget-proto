@@ -69,13 +69,11 @@ void TabWidget::dragMoveEvent(QDragMoveEvent* /*event*/) {
         mIndicatorArea = Area::TABBAR;
     }
     updateIndicatorRect();
-    mDrawOverlay->update();
 }
 
 void TabWidget::dragEnterEvent(QDragEnterEvent* event) {
     if (event->mimeData()->hasText()) {
         mDrawOverlay->setRect(this->rect());
-        updateIndicatorRect();
         if (event->source() == this) {
             event->setDropAction(Qt::MoveAction);
             event->accept();
@@ -85,19 +83,16 @@ void TabWidget::dragEnterEvent(QDragEnterEvent* event) {
     } else {
         event->ignore();
     }
-    mDrawOverlay->update();
 }
 
 void TabWidget::dragLeaveEvent(QDragLeaveEvent* /*event*/) {
     mDrawOverlay->setRect(QRect());
-    mDrawOverlay->update();
 }
 
 void TabWidget::dropEvent(QDropEvent *event) {
     if (event->source() == this) {
         qDebug() << "dropping on it self. There should be a index move operation here.";
         mDrawOverlay->setRect(QRect());
-        mDrawOverlay->update();
         return;
     }
 
@@ -113,7 +108,6 @@ void TabWidget::dropEvent(QDropEvent *event) {
     }
 
     mDrawOverlay->setRect(QRect());
-    mDrawOverlay->update();
 }
 
 void TabWidget::mousePressEvent(QMouseEvent* event) {
@@ -126,15 +120,16 @@ void TabWidget::mouseReleaseEvent(QMouseEvent */*event*/) {
     //QTabWidget::mouseReleaseEvent(event);
 }
 
-void TabWidget::resizeEvent(QResizeEvent */*event*/) {
+void TabWidget::resizeEvent(QResizeEvent* event) {
+    QTabWidget::resizeEvent(event);
     if (mDrawOverlay) {
-        mDrawOverlay->setGeometry(geometry());
+        mDrawOverlay->setGeometry(rect());
     }
 }
 
 void TabWidget::updateIndicatorRect() {
     if (mIndicatorArea != Area::INVALID) {
-        QRect rect = mDrawOverlay->getRect();
+        QRect rect = this->rect();
         rect.setTop(tabBar()->rect().height());
         int marginY = rect.height() * 0.4;
         int marginX = rect.width() * 0.4;

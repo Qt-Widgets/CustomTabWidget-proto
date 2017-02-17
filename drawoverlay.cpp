@@ -2,21 +2,19 @@
 #include <QPainter>
 
 DrawOverlay::DrawOverlay(QWidget *parent) : QWidget(parent) {
-
+    setAttribute(Qt::WA_NoSystemBackground);
+    setAttribute(Qt::WA_TransparentForMouseEvents);
 }
 
 void DrawOverlay::setRect(QRect rect) {
     mRect = rect;
+    update();
 }
 
-void DrawOverlay::paintEvent(QPaintEvent *event) {
+void DrawOverlay::paintEvent(QPaintEvent* /*event*/) {
     if (mRect != QRect()) {
         QPainter painter(this);
         painter.setPen(QPen(QBrush(Qt::blue), 3));
         painter.drawRect(mRect);
-    } else {
-        QPainter painter(this);
-        painter.setPen(QPen(QBrush(Qt::blue), 3 /*Qt::DashLine*/));
-        painter.drawRect(QRect(0,0,200,200));
     }
 }
