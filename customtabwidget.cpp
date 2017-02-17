@@ -5,14 +5,15 @@
 #include <QDrag>
 #include <QMimeData>
 #include <QWindow>
+#include <mainwindow.h>
 
 static QString sourceIndexMimeDataKey() { return QStringLiteral("source/index"); }
 static QString sourceTabTitleMimeDataKey() { return QStringLiteral("source/tabtitle"); }
 
-TabWidget::TabWidget(QWidget *parent) : QTabWidget(parent) {
-    mDrawOverlay = new DrawOverlay(this);
-    mDrawOverlay->raise();
-
+TabWidget::TabWidget(QWidget *parent)
+    : QTabWidget(parent)
+    , mDrawOverlay(new DrawOverlay(this))
+{
     installEventFilter(this);
     setAcceptDrops(true);
 
@@ -39,36 +40,12 @@ void TabWidget::dragMoveEvent(QDragMoveEvent* /*event*/) {
 
     QPoint p = mapFromGlobal(QCursor::pos());
     if (!rect().contains(p)) {
+        //Is this needed?
         //mouse not inside the widget
         return;
     }
 
-    //calculate what area the mouse cursor is in.
-    int left = rect().left();
-    int top = rect().top();
-    int width = rect().width();
-    int height = rect().height();
-    int marginX = width * 0.5;
-    int marginY = height * 0.3;
-
-    bool tabBarArea = (p.y() < tabBar()->rect().height());
-
-    bool topArea = (top + marginY > p.y()) && !tabBarArea;
-    bool bottomArea = (height - marginY < p.y()) && !tabBarArea;
-    bool rightArea = (marginX < p.x()) && !tabBarArea;
-    bool leftArea = (marginX > p.x()) && !tabBarArea;
-
-    if (topArea) {
-        mIndicatorArea = Area::TOP;
-    } else if (bottomArea) {
-        mIndicatorArea = Area::BOTTOM;
-    } else if (rightArea) {
-        mIndicatorArea = Area::RIGHT;
-    } else if (leftArea) {
-        mIndicatorArea = Area::LEFT;
-    } else if (tabBarArea) {
-        mIndicatorArea = Area::TABBAR;
-    }
+    updateIndicatorArea(p);
     updateIndicatorRect();
 }
 
@@ -98,12 +75,14 @@ void TabWidget::dropEvent(QDropEvent *event) {
         QTabWidget* sourceTabWidget = static_cast<QTabWidget*>(event->source());
         QWidget* widget = sourceTabWidget->widget(sourceIndex);
 
-        if (mIndicatorArea == Area::TABBAR) {
+        if (mIndicatorArea == utils::DropArea::TABBAR) {
             QPoint mousePos = tabBar()->mapFromGlobal(QCursor::pos());
             int targetIndex = tabBar()->tabAt(mousePos);
             insertTab(targetIndex, widget, tabTitle);
         } else {
             //todo: split dock widget and create a new custom dockwidget to corresponding area.
+            MainWindow* mainWindow = static_cast<MainWindow*>(topLevelWidget());
+            mainWindow->splitTabWidget(widget, this, mIndicatorArea);
         }
 
         event->acceptProposedAction();
@@ -129,34 +108,63 @@ void TabWidget::resizeEvent(QResizeEvent* event) {
     }
 }
 
+void TabWidget::updateIndicatorArea(QPoint& p) {
+    //calculate what area the mouse cursor is in.
+    int left = rect().left();
+    int top = rect().top();
+    int width = rect().width();
+    int height = rect().height();
+    int marginX = width * 0.5;
+    int marginY = height * 0.3;
+
+    bool tabBarArea = (p.y() < tabBar()->rect().height());
+
+    bool topArea = (top + marginY > p.y()) && !tabBarArea;
+    bool bottomArea = (height - marginY < p.y()) && !tabBarArea;
+    bool rightArea = (marginX < p.x()) && !tabBarArea;
+    bool leftArea = (marginX > p.x()) && !tabBarArea;
+
+    if (topArea) {
+        mIndicatorArea = utils::DropArea::TOP;
+    } else if (bottomArea) {
+        mIndicatorArea = utils::DropArea::BOTTOM;
+    } else if (rightArea) {
+        mIndicatorArea = utils::DropArea::RIGHT;
+    } else if (leftArea) {
+        mIndicatorArea = utils::DropArea::LEFT;
+    } else if (tabBarArea) {
+        mIndicatorArea = utils::DropArea::TABBAR;
+    }
+}
+
 void TabWidget::updateIndicatorRect() {
-    if (mIndicatorArea != Area::INVALID) {
+    if (mIndicatorArea != utils::DropArea::INVALID) {
         QRect rect = this->rect();
         rect.setTop(tabBar()->rect().height());
         int marginY = rect.height() * 0.4;
         int marginX = rect.width() * 0.4;
 
         switch (mIndicatorArea) {
-        case Area::TOP:
+        case utils::DropArea::TOP:
             rect.setBottom(marginY);
             break;
-        case Area::BOTTOM:
+        case utils::DropArea::BOTTOM:
             rect.setTop(rect.bottom() - marginY);
             break;
-        case Area::RIGHT:
+        case utils::DropArea::RIGHT:
             rect.setLeft(rect.right() - marginX);
             break;
-        case Area::LEFT:
+        case utils::DropArea::LEFT:
             rect.setRight(rect.left() + marginX);
             break;
-        case Area::TABBAR: {
+        case utils::DropArea::TABBAR: {
             QPoint mousePos = tabBar()->mapFromGlobal(QCursor::pos());
             int index = tabBar()->tabAt(mousePos);
             rect = tabBar()->tabRect(index);
-            rect.setRight(rect.left() + 5);
+            rect.setRight(rect.left());
             break;
         }
-        case Area::INVALID:
+        case utils::DropArea::INVALID:
             break;
         }
 

@@ -21,6 +21,7 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h \
     customdockwidget.h \
     customtabwidget.h \
-    drawoverlay.h
+    drawoverlay.h \
+    utils.h
 
 FORMS    += mainwindow.ui

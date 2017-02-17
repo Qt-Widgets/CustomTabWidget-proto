@@ -2,6 +2,7 @@
 #include <QTabWidget>
 #include <QFrame>
 #include <QPushButton>
+#include <utils.h>
 
 #include <drawoverlay.h>
 
@@ -26,13 +27,11 @@ private slots:
 
 private:
     void updateIndicatorRect();
+    void updateIndicatorArea(QPoint& p);
 
 private:
     QPushButton* mMenuButton;
     const int mIndicatorMargin = 10;
-    enum Area {
-        TABBAR, TOP, RIGHT, BOTTOM, LEFT, INVALID
-    };
-    Area mIndicatorArea = Area::INVALID;
+    utils::DropArea mIndicatorArea = utils::DropArea::INVALID;
     DrawOverlay* mDrawOverlay;
 };

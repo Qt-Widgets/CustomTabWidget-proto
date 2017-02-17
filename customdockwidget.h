@@ -2,7 +2,8 @@
 
 #include <QDockWidget>
 #include <QVBoxLayout>
-#include <customtabwidget.h>
+
+class TabWidget;
 
 class customDockWidget : public QDockWidget
 {
@@ -10,5 +11,8 @@ class customDockWidget : public QDockWidget
 
 public:
     explicit customDockWidget(QWidget *parent = 0);
+
+private:
+    TabWidget* mTabWidget;
 };
 
