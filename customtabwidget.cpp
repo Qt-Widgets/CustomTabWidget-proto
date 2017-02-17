@@ -5,11 +5,14 @@
 #include <QDrag>
 #include <QMimeData>
 #include <QWindow>
-#include <QPainter>
 
 static QString sourceIndexMimeDataKey() { return QStringLiteral("source/index"); }
 
 TabWidget::TabWidget(QWidget *parent) : QTabWidget(parent) {
+    mDrawOverlay = new DrawOverlay(this);
+    mDrawOverlay->raise();
+
+    installEventFilter(this);
     setAcceptDrops(true);
 
     static QString style("QPushButton {"
@@ -28,8 +31,8 @@ TabWidget::TabWidget(QWidget *parent) : QTabWidget(parent) {
     connect(this, SIGNAL(tabBarClicked(int)), this, SLOT(on_tabBarClicked(int)));
 }
 
-void TabWidget::dragMoveEvent(QDragMoveEvent* event) {
-    if (mDragIndicator == QRect()) {
+void TabWidget::dragMoveEvent(QDragMoveEvent* /*event*/) {
+    if (mDrawOverlay->getRect() == QRect()) {
         return;
     }
 
@@ -47,10 +50,12 @@ void TabWidget::dragMoveEvent(QDragMoveEvent* event) {
     int marginX = width * 0.5;
     int marginY = height * 0.3;
 
-    bool topArea = (top + marginY > p.y());
-    bool bottomArea = (height - marginY < p.y());
-    bool rightArea = (marginX < p.x());
-    bool leftArea = (marginX > p.x());
+    bool tabBarArea = (p.y() < tabBar()->rect().height());
+
+    bool topArea = (top + marginY > p.y()) && !tabBarArea;
+    bool bottomArea = (height - marginY < p.y()) && !tabBarArea;
+    bool rightArea = (marginX < p.x()) && !tabBarArea;
+    bool leftArea = (marginX > p.x()) && !tabBarArea;
 
     if (topArea) {
         mIndicatorArea = Area::TOP;
@@ -60,13 +65,17 @@ void TabWidget::dragMoveEvent(QDragMoveEvent* event) {
         mIndicatorArea = Area::RIGHT;
     } else if (leftArea) {
         mIndicatorArea = Area::LEFT;
+    } else if (tabBarArea) {
+        mIndicatorArea = Area::TABBAR;
     }
-    update();
+    updateIndicatorRect();
+    mDrawOverlay->update();
 }
 
 void TabWidget::dragEnterEvent(QDragEnterEvent* event) {
     if (event->mimeData()->hasText()) {
-        mDragIndicator = this->rect();
+        mDrawOverlay->setRect(this->rect());
+        updateIndicatorRect();
         if (event->source() == this) {
             event->setDropAction(Qt::MoveAction);
             event->accept();
@@ -76,19 +85,19 @@ void TabWidget::dragEnterEvent(QDragEnterEvent* event) {
     } else {
         event->ignore();
     }
-    update();
+    mDrawOverlay->update();
 }
 
-void TabWidget::dragLeaveEvent(QDragLeaveEvent*) {
-    mDragIndicator = QRect();
-    update();
+void TabWidget::dragLeaveEvent(QDragLeaveEvent* /*event*/) {
+    mDrawOverlay->setRect(QRect());
+    mDrawOverlay->update();
 }
 
 void TabWidget::dropEvent(QDropEvent *event) {
     if (event->source() == this) {
         qDebug() << "dropping on it self. There should be a index move operation here.";
-        mDragIndicator = QRect();
-        update();
+        mDrawOverlay->setRect(QRect());
+        mDrawOverlay->update();
         return;
     }
 
@@ -103,8 +112,8 @@ void TabWidget::dropEvent(QDropEvent *event) {
         event->acceptProposedAction();
     }
 
-    mDragIndicator = QRect();
-    update();
+    mDrawOverlay->setRect(QRect());
+    mDrawOverlay->update();
 }
 
 void TabWidget::mousePressEvent(QMouseEvent* event) {
@@ -113,38 +122,48 @@ void TabWidget::mousePressEvent(QMouseEvent* event) {
     qDebug() << event->pos() << " event->pos()";
 }
 
-void TabWidget::mouseReleaseEvent(QMouseEvent *event) {
+void TabWidget::mouseReleaseEvent(QMouseEvent */*event*/) {
     //QTabWidget::mouseReleaseEvent(event);
 }
 
-void TabWidget::paintEvent(QPaintEvent *event) {
-    QTabWidget::paintEvent(event);
-
-    if (mDragIndicator != QRect()) {
-        drawIndicator();
+void TabWidget::resizeEvent(QResizeEvent */*event*/) {
+    if (mDrawOverlay) {
+        mDrawOverlay->setGeometry(geometry());
     }
 }
 
-void TabWidget::drawIndicator() {
+void TabWidget::updateIndicatorRect() {
     if (mIndicatorArea != Area::INVALID) {
-        QPainter painter(this);
-        painter.setPen(QPen(QBrush(Qt::blue), 3, Qt::DashLine));
-
-        QRect rect = mDragIndicator;
+        QRect rect = mDrawOverlay->getRect();
+        rect.setTop(tabBar()->rect().height());
         int marginY = rect.height() * 0.4;
         int marginX = rect.width() * 0.4;
 
-        if (mIndicatorArea == Area::TOP) {
+        switch (mIndicatorArea) {
+        case Area::TOP:
             rect.setBottom(marginY);
-        } else if (mIndicatorArea == Area::BOTTOM) {
+            break;
+        case Area::BOTTOM:
             rect.setTop(rect.bottom() - marginY);
-        } else if (mIndicatorArea == Area::RIGHT) {
+            break;
+        case Area::RIGHT:
             rect.setLeft(rect.right() - marginX);
-        } else if (mIndicatorArea == Area::LEFT) {
+            break;
+        case Area::LEFT:
             rect.setRight(rect.left() + marginX);
+            break;
+        case Area::TABBAR: {
+            QPoint mousePos = tabBar()->mapFromGlobal(QCursor::pos());
+            int index = tabBar()->tabAt(mousePos);
+            rect = tabBar()->tabRect(index);
+            rect.setRight(rect.left() + 5);
+            break;
+        }
+        case Area::INVALID:
+            break;
         }
 
-        painter.drawRect(rect);
+        mDrawOverlay->setRect(rect);
     }
 }
 

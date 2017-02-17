@@ -3,6 +3,8 @@
 #include <QFrame>
 #include <QPushButton>
 
+#include <drawoverlay.h>
+
 class TabWidget : public QTabWidget
 {
     Q_OBJECT
@@ -16,21 +18,21 @@ protected:
     void dropEvent(QDropEvent* event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
-    void paintEvent(QPaintEvent* event) override;
+    void resizeEvent(QResizeEvent* event) override;
 
 private slots:
     void addTabTest();
     void on_tabBarClicked(int index);
 
 private:
-    void drawIndicator();
+    void updateIndicatorRect();
 
 private:
     QPushButton* mMenuButton;
-    QRect mDragIndicator = QRect();
     const int mIndicatorMargin = 10;
     enum Area {
-        TOP, RIGHT, BOTTOM, LEFT, INVALID
+        TABBAR, TOP, RIGHT, BOTTOM, LEFT, INVALID
     };
     Area mIndicatorArea = Area::INVALID;
+    DrawOverlay* mDrawOverlay;
 };

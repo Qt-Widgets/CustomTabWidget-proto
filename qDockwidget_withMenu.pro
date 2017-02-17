@@ -15,10 +15,12 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     customdockwidget.cpp \
-    customtabwidget.cpp
+    customtabwidget.cpp \
+    drawoverlay.cpp
 
 HEADERS  += mainwindow.h \
     customdockwidget.h \
-    customtabwidget.h
+    customtabwidget.h \
+    drawoverlay.h
 
 FORMS    += mainwindow.ui
