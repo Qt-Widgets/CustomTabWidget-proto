@@ -24,10 +24,11 @@ public:
     static MainWindow* instance();
 
     void splitTabWidget(QWidget* source, QWidget* target, utils::DropArea dropArea);
-    QBoxLayout* findWidgetLayout(QWidget* target, QBoxLayout* targetLayout);
+    QBoxLayout* findWidgetLayout(QWidget* target, int &index);
 
 private:
     Ui::MainWindow *ui;
+    QVector<QBoxLayout*> mLayouts;
 };
 
 #endif // MAINWINDOW_H

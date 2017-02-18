@@ -81,7 +81,7 @@ void TabWidget::dropEvent(QDropEvent *event) {
             insertTab(targetIndex, sourceWidget, tabTitle);
         } else {
             //todo: split dock widget and create a new custom dockwidget to corresponding area.
-            MainWindow::instance()->splitTabWidget(sourceTabWidget, this, mIndicatorArea);
+            MainWindow::instance()->splitTabWidget(sourceWidget, this, mIndicatorArea);
         }
 
         event->acceptProposedAction();

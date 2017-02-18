@@ -1,3 +1,4 @@
+#include "customtabwidget.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QStyleFactory>
@@ -32,17 +33,19 @@ MainWindow::MainWindow(QWidget *parent)
     setAnimated(false);
 
     //temp widgets
-    ui->centralLayout->addWidget(new customDockWidget(this), 1);
-    ui->centralLayout->addWidget(new customDockWidget(this), 1);
+    ui->centralLayout->addWidget(new customDockWidget(this, new QWidget(this)), 1);
+    ui->centralLayout->addWidget(new customDockWidget(this, new QWidget(this)), 1);
+    mLayouts.append(ui->centralLayout);
 }
 
 MainWindow::~MainWindow() {
     delete ui;
 }
 
-void MainWindow::splitTabWidget(QWidget *source, QWidget *target, utils::DropArea dropArea) {
-    //traverse layouts and find layout for the target widget. ui->horizontalLayout is the root of all layouts.
-    QBoxLayout* targetLayout = findWidgetLayout(target, ui->centralLayout);
+void MainWindow::splitTabWidget(QWidget *sourceTab, QWidget *target, utils::DropArea dropArea) {
+    //find layout for the target widget. ui->horizontalLayout is the root of all layouts.
+    int index;
+    QBoxLayout* targetLayout = findWidgetLayout(target, index);
     if (!targetLayout) {
         qDebug() << "ERROR: Could not find layout for the widget.";
         return;
@@ -51,32 +54,47 @@ void MainWindow::splitTabWidget(QWidget *source, QWidget *target, utils::DropAre
     bool vertical = (targetLayout->direction() == QBoxLayout::TopToBottom)
             || (targetLayout->direction() == QBoxLayout::BottomToTop);
     bool dropVertically = (dropArea == utils::BOTTOM || dropArea == utils::TOP);
+    bool dropToRight = (dropArea == utils::BOTTOM || dropArea == utils::RIGHT);
 
+    // if layout.direction and dropArea direction are aligned
     if (vertical == dropVertically) {
-        qDebug() << "only insert to layout.";
-        // insert source to target. source index is targetIndex or targetIndex +1
+        index = dropToRight ? index++ : index;
+        targetLayout->insertWidget(index, new customDockWidget(this, sourceTab), 1);
     } else {
-        qDebug() << "split widget.";
-        //   1. create a new layout with correct orientation
-        //   2. add target widget to the layout
-        //   3. add source widget to the layout
+        // Split Widget.
+        QWidget* targetWidget = targetLayout->itemAt(index)->widget();
+        targetLayout->removeWidget(targetWidget);
+        int dropIndex = dropToRight ? 1 : 0;
+
+        // create new layout in opposite direction of the targetLayout.
+        QBoxLayout::Direction splitDirection = QBoxLayout::TopToBottom;
+        if (vertical) {
+            splitDirection = QBoxLayout::LeftToRight;
+        }
+        QBoxLayout* splitLayout = new QBoxLayout(splitDirection);
+        splitLayout->addWidget(targetWidget, 1);
+        splitLayout->insertWidget(dropIndex, new customDockWidget(this, sourceTab), 1);
+        targetLayout->insertLayout(index, splitLayout, 1);
+        mLayouts.append(splitLayout);
     }
 }
 
-QBoxLayout* MainWindow::findWidgetLayout(QWidget* target, QBoxLayout* targetLayout) {
-    for (int i = 0; i < targetLayout->count(); i++) {
-        customDockWidget* foundContainerWidget = static_cast<customDockWidget*>(targetLayout->itemAt(i)->widget());
-        if (foundContainerWidget) {
-            QWidget* foundTabWidget = foundContainerWidget->tabWidget();
-            if (foundTabWidget == target) {
-                return targetLayout;
-            }
+QBoxLayout *MainWindow::findWidgetLayout(QWidget* target, int& index) {
+    for (QBoxLayout* layout : mLayouts) {
+        customDockWidget* foundContainerWidget = static_cast<customDockWidget*>(target->parentWidget());
+        if (!foundContainerWidget) {
+            continue;
         }
 
-        //find all layouts recursively
-        QBoxLayout* foundLayout = static_cast<QBoxLayout*>(targetLayout->itemAt(i)->layout());
-        if (foundLayout) {
-            findWidgetLayout(target, foundLayout);
+        int i = layout->indexOf(foundContainerWidget);
+        if (i < 0) {
+            continue;
+        }
+
+        QWidget* foundTabWidget = foundContainerWidget->tabWidget();
+        if (foundTabWidget == target) {
+            index = i;
+            return layout;
         }
     }
     return nullptr;
