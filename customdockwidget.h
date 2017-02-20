@@ -2,8 +2,7 @@
 
 #include <QDockWidget>
 #include <QVBoxLayout>
-
-class TabWidget;
+#include <customtabwidget.h>
 
 class customDockWidget : public QDockWidget
 {
@@ -11,9 +10,20 @@ class customDockWidget : public QDockWidget
 
 public:
     explicit customDockWidget(QWidget *parent = 0, QWidget *tab = 0);
-    QWidget* tabWidget();
+    ~customDockWidget();
+    bool hasOnlyOneTab();
+    bool hasNoTabs();
+    QWidget* tab(int index);
+    void insertTab(int index, QWidget* tab, const QString& label);
+    void addTab(QWidget* tab, const QString &label);
+
+public slots:
+    void onCheckIfEmptyContainer();
+
+signals:
+    void emptyContainer(customDockWidget*);
 
 private:
-    TabWidget* mTabWidget;
+    TabWidget mTabWidget;
 };
 

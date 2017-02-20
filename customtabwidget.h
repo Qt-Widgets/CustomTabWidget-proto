@@ -11,6 +11,7 @@ class TabWidget : public QTabWidget
     Q_OBJECT
 public:
     explicit TabWidget(QWidget *parent = 0);
+    ~TabWidget();
 
 protected:
     void dragMoveEvent(QDragMoveEvent* event) override;
@@ -24,6 +25,9 @@ protected:
 private slots:
     void addTabTest();
     void on_tabBarClicked(int index);
+
+signals:
+    void checkIfEmptyContainer();
 
 private:
     void updateIndicatorRect();

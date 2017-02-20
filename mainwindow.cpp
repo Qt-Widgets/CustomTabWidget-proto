@@ -33,8 +33,8 @@ MainWindow::MainWindow(QWidget *parent)
     setAnimated(false);
 
     //temp widgets
-    ui->centralLayout->addWidget(new customDockWidget(this, new QWidget(this)), 1);
-    ui->centralLayout->addWidget(new customDockWidget(this, new QWidget(this)), 1);
+    ui->centralLayout->addWidget(registerContainer(new customDockWidget(this, new QWidget())), 1);
+    ui->centralLayout->addWidget(registerContainer(new customDockWidget(this, new QWidget())), 1);
     mLayouts.append(ui->centralLayout);
 }
 
@@ -42,10 +42,19 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 
-void MainWindow::splitTabWidget(QWidget *sourceTab, QWidget *target, utils::DropArea dropArea) {
+void MainWindow::splitTabWidget(
+          int sourceTabIndex
+        , customDockWidget* sourceContainer
+        , customDockWidget* targetContainer
+        , utils::DropArea dropArea)
+{
     //find layout for the target widget. ui->horizontalLayout is the root of all layouts.
-    int index;
-    QBoxLayout* targetLayout = findWidgetLayout(target, index);
+    int targetLayoutIndex;
+    int sourceLayoutIndex;
+    customDockWidget& r_targetContainer = *targetContainer;
+    customDockWidget& r_sourceContainer = *sourceContainer;
+    QBoxLayout* targetLayout = findWidgetLayout(r_targetContainer, targetLayoutIndex);
+    QBoxLayout* sourceLayout = findWidgetLayout(r_sourceContainer, sourceLayoutIndex);
     if (!targetLayout) {
         qDebug() << "ERROR: Could not find layout for the widget.";
         return;
@@ -56,14 +65,24 @@ void MainWindow::splitTabWidget(QWidget *sourceTab, QWidget *target, utils::Drop
     bool dropVertically = (dropArea == utils::BOTTOM || dropArea == utils::TOP);
     bool dropToRight = (dropArea == utils::BOTTOM || dropArea == utils::RIGHT);
 
-    // if layout.direction and dropArea direction are aligned
     if (vertical == dropVertically) {
-        index = dropToRight ? index++ : index;
-        targetLayout->insertWidget(index, new customDockWidget(this, sourceTab), 1);
+        // inset to layout if layout.direction and dropArea direction are aligned
+        targetLayoutIndex = dropToRight ? targetLayoutIndex++ : targetLayoutIndex;
+
+        if (sourceContainer->hasOnlyOneTab()) {
+            targetLayout->insertWidget(targetLayoutIndex, sourceContainer, 1);
+        } else {
+            targetLayout->insertWidget(targetLayoutIndex, new customDockWidget(this, sourceContainer->tab(sourceTabIndex)), 1);
+        }
     } else {
         // Split Widget.
-        QWidget* targetWidget = targetLayout->itemAt(index)->widget();
-        targetLayout->removeWidget(targetWidget);
+        if (sourceContainer->hasOnlyOneTab() && targetLayout == sourceLayout && targetLayoutIndex == sourceLayoutIndex) {
+            // Cancel operation if trying to split self when there is only one tab.
+            return;
+        }
+
+        //QWidget* targetWidget = targetLayout->itemAt(targetLayoutIndex)->widget();
+        targetLayout->removeWidget(targetContainer);
         int dropIndex = dropToRight ? 1 : 0;
 
         // create new layout in opposite direction of the targetLayout.
@@ -72,30 +91,64 @@ void MainWindow::splitTabWidget(QWidget *sourceTab, QWidget *target, utils::Drop
             splitDirection = QBoxLayout::LeftToRight;
         }
         QBoxLayout* splitLayout = new QBoxLayout(splitDirection);
-        splitLayout->addWidget(targetWidget, 1);
-        splitLayout->insertWidget(dropIndex, new customDockWidget(this, sourceTab), 1);
-        targetLayout->insertLayout(index, splitLayout, 1);
+        splitLayout->addWidget(targetContainer, 1);
+        if (sourceContainer->hasOnlyOneTab()) {
+            splitLayout->insertWidget(dropIndex, sourceContainer, 1);
+        } else {
+            splitLayout->insertWidget(dropIndex, new customDockWidget(this, sourceContainer->tab(sourceTabIndex)), 1);
+        }
+        targetLayout->insertLayout(targetLayoutIndex, splitLayout, 1);
         mLayouts.append(splitLayout);
     }
 }
 
-QBoxLayout *MainWindow::findWidgetLayout(QWidget* target, int& index) {
+QBoxLayout *MainWindow::findWidgetLayout(customDockWidget& target, int& index) {
     for (QBoxLayout* layout : mLayouts) {
-        customDockWidget* foundContainerWidget = static_cast<customDockWidget*>(target->parentWidget());
-        if (!foundContainerWidget) {
-            continue;
-        }
-
-        int i = layout->indexOf(foundContainerWidget);
+        customDockWidget* target_ptr = &target;
+        int i = layout->indexOf(static_cast<QWidget*>(target_ptr));
         if (i < 0) {
+            //target not found in this layout
             continue;
-        }
-
-        QWidget* foundTabWidget = foundContainerWidget->tabWidget();
-        if (foundTabWidget == target) {
+        } else {
             index = i;
             return layout;
         }
     }
     return nullptr;
 }
+
+void MainWindow::clearEmptyLayouts() {
+    QVector<QBoxLayout*> layoutsToRemove;
+    for (QBoxLayout* layout : mLayouts) {
+        if (!layout || layout->count() == 0) {
+            layoutsToRemove.append(layout);
+        }
+    }
+    for (QBoxLayout* layout : layoutsToRemove) {
+        mLayouts.removeOne(layout);
+        if (layout) {
+            layout->deleteLater();
+        }
+    }
+}
+
+customDockWidget *MainWindow::registerContainer(customDockWidget *container) {
+    connect(container, SIGNAL(emptyContainer(customDockWidget*)), this, SLOT(onEmptyContainer(customDockWidget*)));
+}
+
+void MainWindow::unRegisterContainer(customDockWidget *container) {
+    disconnect(container, SIGNAL(emptyContainer(customDockWidget*)), this, SLOT(onEmptyContainer(customDockWidget*)));
+}
+
+void MainWindow::onEmptyContainer(customDockWidget* container) {
+    int index;
+    customDockWidget& r_container = *container;
+    QBoxLayout* layout = findWidgetLayout(r_container, index);
+    layout->removeWidget(container);
+    unRegisterContainer(container);
+
+    // i guess I have to create a post event for the delete?
+    container->deleteLater();
+}
+
+

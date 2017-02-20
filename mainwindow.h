@@ -23,8 +23,17 @@ public:
 public:
     static MainWindow* instance();
 
-    void splitTabWidget(QWidget* source, QWidget* target, utils::DropArea dropArea);
-    QBoxLayout* findWidgetLayout(QWidget* target, int &index);
+    void splitTabWidget(int sourceTabIndex,
+                        customDockWidget* sourceContainer,
+                        customDockWidget* targetContainer,
+                        utils::DropArea dropArea);
+    QBoxLayout* findWidgetLayout(customDockWidget &target, int &index);
+    void clearEmptyLayouts();
+    customDockWidget* registerContainer(customDockWidget* container);
+    void unRegisterContainer(customDockWidget* container);
+
+public slots:
+    void onEmptyContainer(customDockWidget *container);
 
 private:
     Ui::MainWindow *ui;

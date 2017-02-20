@@ -16,6 +16,7 @@ TabWidget::TabWidget(QWidget *parent)
 {
     installEventFilter(this);
     setAcceptDrops(true);
+    //setTabsClosable(true);
 
     static QString style("QPushButton {"
           "   padding-left: 4px;"
@@ -31,6 +32,11 @@ TabWidget::TabWidget(QWidget *parent)
 
     connect(mMenuButton, SIGNAL(clicked(bool)), this, SLOT(addTabTest()));
     connect(this, SIGNAL(tabBarClicked(int)), this, SLOT(on_tabBarClicked(int)));
+}
+
+TabWidget::~TabWidget() {
+    disconnect(mMenuButton, SIGNAL(clicked(bool)), this, SLOT(addTabTest()));
+    disconnect(this, SIGNAL(tabBarClicked(int)), this, SLOT(on_tabBarClicked(int)));
 }
 
 void TabWidget::dragMoveEvent(QDragMoveEvent* /*event*/) {
@@ -72,22 +78,30 @@ void TabWidget::dropEvent(QDropEvent *event) {
     if (mime->hasText()) {
         int sourceIndex = mime->data(sourceIndexMimeDataKey()).toInt();
         QString tabTitle = QString::fromStdString(mime->data(sourceTabTitleMimeDataKey()).toStdString());
-        QTabWidget* sourceTabWidget = static_cast<QTabWidget*>(event->source());
+        TabWidget* sourceTabWidget = static_cast<TabWidget*>(event->source());
         QWidget* sourceWidget = sourceTabWidget->widget(sourceIndex);
+        QPoint mousePos = tabBar()->mapFromGlobal(QCursor::pos());
+        int targetIndex = tabBar()->tabAt(mousePos);
 
         if (mIndicatorArea == utils::DropArea::TABBAR) {
-            QPoint mousePos = tabBar()->mapFromGlobal(QCursor::pos());
-            int targetIndex = tabBar()->tabAt(mousePos);
             insertTab(targetIndex, sourceWidget, tabTitle);
+
+            if (sourceTabWidget == this) {
+                qDebug() << "change tab order";
+            } else {
+                qDebug() << "move between two tabWidgets";
+            }
         } else {
-            //todo: split dock widget and create a new custom dockwidget to corresponding area.
-            MainWindow::instance()->splitTabWidget(sourceWidget, this, mIndicatorArea);
+            customDockWidget* sourceContainer = static_cast<customDockWidget*>(sourceTabWidget->parentWidget());
+            customDockWidget* targetContainer = static_cast<customDockWidget*>(this->parentWidget());
+            MainWindow::instance()->splitTabWidget(sourceIndex, sourceContainer, targetContainer, mIndicatorArea);
         }
 
         event->acceptProposedAction();
+        mDrawOverlay->setRect(QRect());
+        MainWindow::instance()->clearEmptyLayouts();
+        emit sourceTabWidget->checkIfEmptyContainer();
     }
-
-    mDrawOverlay->setRect(QRect());
 }
 
 void TabWidget::mousePressEvent(QMouseEvent* event) {
