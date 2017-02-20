@@ -134,6 +134,7 @@ void MainWindow::clearEmptyLayouts() {
 
 customDockWidget *MainWindow::registerContainer(customDockWidget *container) {
     connect(container, SIGNAL(emptyContainer(customDockWidget*)), this, SLOT(onEmptyContainer(customDockWidget*)));
+    return container;
 }
 
 void MainWindow::unRegisterContainer(customDockWidget *container) {
