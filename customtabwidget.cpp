@@ -6,6 +6,7 @@
 #include <QMimeData>
 #include <QWindow>
 #include <mainwindow.h>
+#include <assert.h>
 
 static QString sourceIndexMimeDataKey() { return QStringLiteral("source/index"); }
 static QString sourceTabTitleMimeDataKey() { return QStringLiteral("source/tabtitle"); }
@@ -39,7 +40,7 @@ TabWidget::~TabWidget() {
     disconnect(this, SIGNAL(tabBarClicked(int)), this, SLOT(on_tabBarClicked(int)));
 }
 
-void TabWidget::dragMoveEvent(QDragMoveEvent* /*event*/) {
+void TabWidget::dragMoveEvent(QDragMoveEvent* event) {
     if (mDrawOverlay->getRect() == QRect()) {
         return;
     }
@@ -53,6 +54,7 @@ void TabWidget::dragMoveEvent(QDragMoveEvent* /*event*/) {
 
     updateIndicatorArea(p);
     updateIndicatorRect();
+    event->accept();
 }
 
 void TabWidget::dragEnterEvent(QDragEnterEvent* event) {
@@ -69,8 +71,9 @@ void TabWidget::dragEnterEvent(QDragEnterEvent* event) {
     }
 }
 
-void TabWidget::dragLeaveEvent(QDragLeaveEvent* /*event*/) {
+void TabWidget::dragLeaveEvent(QDragLeaveEvent* event) {
     mDrawOverlay->setRect(QRect());
+    event->accept();
 }
 
 void TabWidget::dropEvent(QDropEvent *event) {
@@ -98,9 +101,10 @@ void TabWidget::dropEvent(QDropEvent *event) {
         }
 
         event->acceptProposedAction();
+        event->accept();
         mDrawOverlay->setRect(QRect());
-        MainWindow::instance()->clearEmptyLayouts();
         emit sourceTabWidget->checkIfEmptyContainer();
+        MainWindow::instance()->clearEmptyLayouts();
     }
 }
 
@@ -108,10 +112,12 @@ void TabWidget::mousePressEvent(QMouseEvent* event) {
     //click outside of the tab
     QTabWidget::mousePressEvent(event);
     qDebug() << event->pos() << " event->pos()";
+    event->accept();
 }
 
-void TabWidget::mouseReleaseEvent(QMouseEvent */*event*/) {
+void TabWidget::mouseReleaseEvent(QMouseEvent *event) {
     //QTabWidget::mouseReleaseEvent(event);
+    event->accept();
 }
 
 void TabWidget::resizeEvent(QResizeEvent* event) {
@@ -119,6 +125,7 @@ void TabWidget::resizeEvent(QResizeEvent* event) {
     if (mDrawOverlay) {
         mDrawOverlay->setGeometry(this->rect());
     }
+    event->accept();
 }
 
 void TabWidget::updateIndicatorArea(QPoint& p) {
@@ -213,6 +220,6 @@ void TabWidget::on_tabBarClicked(int index) {
     drag->setPixmap(pixmap);
     Qt::DropAction dropAction = drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction);
 
-    if (dropAction == Qt::MoveAction)
-        tabWidget->close();
+//    if (dropAction == Qt::MoveAction)
+//        tabWidget->close();
 }

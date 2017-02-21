@@ -33,8 +33,8 @@ MainWindow::MainWindow(QWidget *parent)
     setAnimated(false);
 
     //temp widgets
-    ui->centralLayout->addWidget(registerContainer(new customDockWidget(this, new QWidget())), 1);
-    ui->centralLayout->addWidget(registerContainer(new customDockWidget(this, new QWidget())), 1);
+    ui->centralLayout->addWidget(new customDockWidget(this), 1);
+    ui->centralLayout->addWidget(new customDockWidget(this), 1);
     mLayouts.append(ui->centralLayout);
 }
 
@@ -72,7 +72,8 @@ void MainWindow::splitTabWidget(
         if (sourceContainer->hasOnlyOneTab()) {
             targetLayout->insertWidget(targetLayoutIndex, sourceContainer, 1);
         } else {
-            targetLayout->insertWidget(targetLayoutIndex, new customDockWidget(this, sourceContainer->tab(sourceTabIndex)), 1);
+            targetLayout->insertWidget(targetLayoutIndex,
+                                       new customDockWidget(this, sourceContainer->tab(sourceTabIndex)), 1);
         }
     } else {
         // Split Widget.
@@ -95,7 +96,8 @@ void MainWindow::splitTabWidget(
         if (sourceContainer->hasOnlyOneTab()) {
             splitLayout->insertWidget(dropIndex, sourceContainer, 1);
         } else {
-            splitLayout->insertWidget(dropIndex, new customDockWidget(this, sourceContainer->tab(sourceTabIndex)), 1);
+            splitLayout->insertWidget(dropIndex,
+                                      new customDockWidget(this, sourceContainer->tab(sourceTabIndex)), 1);
         }
         targetLayout->insertLayout(targetLayoutIndex, splitLayout, 1);
         mLayouts.append(splitLayout);
@@ -132,9 +134,8 @@ void MainWindow::clearEmptyLayouts() {
     }
 }
 
-customDockWidget *MainWindow::registerContainer(customDockWidget *container) {
+void MainWindow::registerContainer(customDockWidget *container) {
     connect(container, SIGNAL(emptyContainer(customDockWidget*)), this, SLOT(onEmptyContainer(customDockWidget*)));
-    return container;
 }
 
 void MainWindow::unRegisterContainer(customDockWidget *container) {
@@ -146,10 +147,10 @@ void MainWindow::onEmptyContainer(customDockWidget* container) {
     customDockWidget& r_container = *container;
     QBoxLayout* layout = findWidgetLayout(r_container, index);
     layout->removeWidget(container);
-    unRegisterContainer(container);
 
-    // i guess I have to create a post event for the delete?
-    container->deleteLater();
+    if (container) {
+        removeDockWidget(container);
+    }
 }
 
 

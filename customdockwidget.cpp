@@ -11,15 +11,20 @@ customDockWidget::customDockWidget(QWidget *parent, QWidget* tab)
     setTitleBarWidget(new QWidget(this));
 
     //temp add some dummy tabs
+    if (!tab) {
+        tab = new QWidget(this);
+    }
     mTabWidget.addTab(tab, "tab1");
 
     setWidget(&mTabWidget);
     setStyleSheet("*{ background-color: #AAAAAA; }");
     connect(&mTabWidget, SIGNAL(checkIfEmptyContainer()), this, SLOT(onCheckIfEmptyContainer()));
+    MainWindow::instance()->registerContainer(this);
 }
 
 customDockWidget::~customDockWidget() {
     disconnect(&mTabWidget, SIGNAL(checkIfEmptyContainer()), this, SLOT(onCheckIfEmptyContainer()));
+    MainWindow::instance()->unRegisterContainer(this);
 }
 
 bool customDockWidget::hasOnlyOneTab() {

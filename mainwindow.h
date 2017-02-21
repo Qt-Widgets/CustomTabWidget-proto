@@ -29,7 +29,7 @@ public:
                         utils::DropArea dropArea);
     QBoxLayout* findWidgetLayout(customDockWidget &target, int &index);
     void clearEmptyLayouts();
-    customDockWidget* registerContainer(customDockWidget* container);
+    void registerContainer(customDockWidget* container);
     void unRegisterContainer(customDockWidget* container);
 
 public slots:
