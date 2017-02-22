@@ -6,6 +6,8 @@
 #include <customdockwidget.h>
 #include <QDebug>
 #include <assert.h>
+#include <QResource>
+#include <QFile>
 
 MainWindow* MainWindow::sInstance = nullptr;
 
@@ -31,6 +33,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->setupUi(this);
     setAnimated(false);
+
+    mStyleSheet = loadFile(":/style/stylesheet.qss");
+    setStyleSheet("QMainWindow { background-color: #08080d; }");
 
     //temp widgets
     ui->centralLayout->addWidget(new customDockWidget(this), 1);
@@ -151,6 +156,20 @@ void MainWindow::onEmptyContainer(customDockWidget* container) {
     if (container) {
         removeDockWidget(container);
     }
+}
+
+QString MainWindow::loadFile(QString fileName) {
+    QResource common(fileName);
+    QFile commonFile(common.absoluteFilePath());
+
+    if (!commonFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "Unable to open file: " << commonFile.fileName() << " besause of error " << commonFile.errorString() << endl;
+        return QString();
+    }
+
+    QTextStream in(&commonFile);
+    QString content = in.readAll();
+    return content;
 }
 
 

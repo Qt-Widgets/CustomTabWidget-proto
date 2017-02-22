@@ -31,6 +31,7 @@ public:
     void clearEmptyLayouts();
     void registerContainer(customDockWidget* container);
     void unRegisterContainer(customDockWidget* container);
+    QString styleSheetFile() { return mStyleSheet; }
 
 public slots:
     void onEmptyContainer(customDockWidget *container);
@@ -38,6 +39,8 @@ public slots:
 private:
     Ui::MainWindow *ui;
     QVector<QBoxLayout*> mLayouts;
+    QString mStyleSheet;
+    QString loadFile(QString fileName);
 };
 
 #endif // MAINWINDOW_H

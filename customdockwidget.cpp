@@ -17,7 +17,9 @@ customDockWidget::customDockWidget(QWidget *parent, QWidget* tab)
     mTabWidget.addTab(tab, "tab1");
 
     setWidget(&mTabWidget);
-    setStyleSheet("*{ background-color: #AAAAAA; }");
+
+    setStyleSheet(MainWindow::instance()->styleSheetFile());
+
     connect(&mTabWidget, SIGNAL(checkIfEmptyContainer()), this, SLOT(onCheckIfEmptyContainer()));
     MainWindow::instance()->registerContainer(this);
 }

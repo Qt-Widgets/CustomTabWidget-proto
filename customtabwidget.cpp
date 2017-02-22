@@ -20,6 +20,7 @@ TabWidget::TabWidget(QWidget *parent)
     //setTabsClosable(true);
 
     static QString style("QPushButton {"
+          "   background-color: #757575;"
           "   padding-left: 4px;"
           "   padding-right: 4px;"
           "   padding-top: 2px;"
