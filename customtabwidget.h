@@ -23,7 +23,7 @@ protected:
     void resizeEvent(QResizeEvent* event) override;
 
 private slots:
-    void addTabTest();
+    void onMenuButtonClicked();
     void on_tabBarClicked(int index);
 
 signals:

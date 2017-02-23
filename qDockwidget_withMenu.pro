@@ -16,13 +16,15 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     customdockwidget.cpp \
     customtabwidget.cpp \
-    drawoverlay.cpp
+    drawoverlay.cpp \
+    splitter.cpp
 
 HEADERS  += mainwindow.h \
     customdockwidget.h \
     customtabwidget.h \
     drawoverlay.h \
-    utils.h
+    utils.h \
+    splitter.h
 
 FORMS    += mainwindow.ui
 

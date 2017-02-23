@@ -4,7 +4,7 @@
 #include <mainwindow.h>
 #include <QDebug>
 
-customDockWidget::customDockWidget(QWidget *parent, QWidget* tab)
+TabWidgetContainer::TabWidgetContainer(QWidget *parent, QWidget* tab)
     : QDockWidget(parent)
 {
     setFeatures(NoDockWidgetFeatures);
@@ -14,42 +14,41 @@ customDockWidget::customDockWidget(QWidget *parent, QWidget* tab)
     if (!tab) {
         tab = new QWidget(this);
     }
-    mTabWidget.addTab(tab, "tab1");
+    int runningNumber = MainWindow::instance()->getRunningNumber();
+    mTabWidget.addTab(tab, QString("tab").append(QString::number(runningNumber)));
 
     setWidget(&mTabWidget);
-
-    setStyleSheet(MainWindow::instance()->styleSheetFile());
 
     connect(&mTabWidget, SIGNAL(checkIfEmptyContainer()), this, SLOT(onCheckIfEmptyContainer()));
     MainWindow::instance()->registerContainer(this);
 }
 
-customDockWidget::~customDockWidget() {
+TabWidgetContainer::~TabWidgetContainer() {
     disconnect(&mTabWidget, SIGNAL(checkIfEmptyContainer()), this, SLOT(onCheckIfEmptyContainer()));
     MainWindow::instance()->unRegisterContainer(this);
 }
 
-bool customDockWidget::hasOnlyOneTab() {
+bool TabWidgetContainer::hasOnlyOneTab() {
     return mTabWidget.tabBar()->count() == 1;
 }
 
-bool customDockWidget::hasNoTabs() {
+bool TabWidgetContainer::hasNoTabs() {
     return mTabWidget.tabBar()->count() == 0;
 }
 
-QWidget *customDockWidget::tab(int index) {
+QWidget *TabWidgetContainer::tab(int index) {
     return mTabWidget.widget(index);
 }
 
-void customDockWidget::insertTab(int index, QWidget *tab, const QString& label) {
+void TabWidgetContainer::insertTab(int index, QWidget *tab, const QString& label) {
     mTabWidget.insertTab(index, tab, label);
 }
 
-void customDockWidget::addTab(QWidget *tab, const QString& label) {
+void TabWidgetContainer::addTab(QWidget *tab, const QString& label) {
     mTabWidget.addTab(tab, label);
 }
 
-void customDockWidget::onCheckIfEmptyContainer() {
+void TabWidgetContainer::onCheckIfEmptyContainer() {
     if (hasNoTabs()) {
         qDebug() << "has no tabs";
         emit emptyContainer(this);

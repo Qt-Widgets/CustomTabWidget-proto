@@ -1,16 +1,15 @@
 #pragma once
 
 #include <QDockWidget>
-#include <QVBoxLayout>
 #include <customtabwidget.h>
 
-class customDockWidget : public QDockWidget
+class TabWidgetContainer : public QDockWidget
 {
     Q_OBJECT
 
 public:
-    explicit customDockWidget(QWidget *parent = 0, QWidget *tab = 0);
-    ~customDockWidget();
+    explicit TabWidgetContainer(QWidget *parent = 0, QWidget *tab = 0);
+    ~TabWidgetContainer();
     bool hasOnlyOneTab();
     bool hasNoTabs();
     QWidget* tab(int index);
@@ -21,7 +20,7 @@ public slots:
     void onCheckIfEmptyContainer();
 
 signals:
-    void emptyContainer(customDockWidget*);
+    void emptyContainer(TabWidgetContainer*);
 
 private:
     TabWidget mTabWidget;

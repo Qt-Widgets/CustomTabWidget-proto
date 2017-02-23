@@ -32,12 +32,12 @@ TabWidget::TabWidget(QWidget *parent)
     mMenuButton->setStyleSheet(style);
     setCornerWidget(mMenuButton);
 
-    connect(mMenuButton, SIGNAL(clicked(bool)), this, SLOT(addTabTest()));
+    connect(mMenuButton, SIGNAL(clicked(bool)), this, SLOT(onMenuButtonClicked()));
     connect(this, SIGNAL(tabBarClicked(int)), this, SLOT(on_tabBarClicked(int)));
 }
 
 TabWidget::~TabWidget() {
-    disconnect(mMenuButton, SIGNAL(clicked(bool)), this, SLOT(addTabTest()));
+    disconnect(mMenuButton, SIGNAL(clicked(bool)), this, SLOT(onMenuButtonClicked()));
     disconnect(this, SIGNAL(tabBarClicked(int)), this, SLOT(on_tabBarClicked(int)));
 }
 
@@ -96,16 +96,16 @@ void TabWidget::dropEvent(QDropEvent *event) {
                 qDebug() << "move between two tabWidgets";
             }
         } else {
-            customDockWidget* sourceContainer = static_cast<customDockWidget*>(sourceTabWidget->parentWidget());
-            customDockWidget* targetContainer = static_cast<customDockWidget*>(this->parentWidget());
+            TabWidgetContainer* sourceContainer = static_cast<TabWidgetContainer*>(sourceTabWidget->parentWidget());
+            TabWidgetContainer* targetContainer = static_cast<TabWidgetContainer*>(this->parentWidget());
             MainWindow::instance()->splitTabWidget(sourceIndex, sourceContainer, targetContainer, mIndicatorArea);
         }
 
         event->acceptProposedAction();
         event->accept();
         mDrawOverlay->setRect(QRect());
-        emit sourceTabWidget->checkIfEmptyContainer();
-        MainWindow::instance()->clearEmptyLayouts();
+        //emit sourceTabWidget->checkIfEmptyContainer();
+        //MainWindow::instance()->clearEmptyLayouts();
     }
 }
 
@@ -193,8 +193,9 @@ void TabWidget::updateIndicatorRect() {
     }
 }
 
-void TabWidget::addTabTest() {
-    addTab(new QFrame(this), "new Tab");
+void TabWidget::onMenuButtonClicked() {
+    int runningNumber = MainWindow::instance()->getRunningNumber();
+    addTab(new QFrame(this), QString("tab").append(QString::number(runningNumber)));
 }
 
 void TabWidget::on_tabBarClicked(int index) {

@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <customdockwidget.h>
 #include <utils.h>
+#include <splitter.h>
 
 namespace Ui {
 class MainWindow;
@@ -24,22 +25,24 @@ public:
     static MainWindow* instance();
 
     void splitTabWidget(int sourceTabIndex,
-                        customDockWidget* sourceContainer,
-                        customDockWidget* targetContainer,
+                        TabWidgetContainer* sourceContainer,
+                        TabWidgetContainer* targetContainer,
                         utils::DropArea dropArea);
-    QBoxLayout* findWidgetLayout(customDockWidget &target, int &index);
+    Splitter* findSplitter(TabWidgetContainer &target, int &index);
     void clearEmptyLayouts();
-    void registerContainer(customDockWidget* container);
-    void unRegisterContainer(customDockWidget* container);
+    void registerContainer(TabWidgetContainer* container);
+    void unRegisterContainer(TabWidgetContainer* container);
     QString styleSheetFile() { return mStyleSheet; }
+    int getRunningNumber() { return ++mRunningCount; }
 
 public slots:
-    void onEmptyContainer(customDockWidget *container);
+    void onEmptyContainer(TabWidgetContainer *container);
 
 private:
     Ui::MainWindow *ui;
-    QVector<QBoxLayout*> mLayouts;
+    QVector<Splitter*> mLayouts;
     QString mStyleSheet;
+    int mRunningCount = 0;
     QString loadFile(QString fileName);
 };
 
