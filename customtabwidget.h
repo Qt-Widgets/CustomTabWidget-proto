@@ -3,7 +3,6 @@
 #include <QFrame>
 #include <QPushButton>
 #include <utils.h>
-
 #include <drawoverlay.h>
 
 class TabWidget : public QTabWidget

@@ -37,6 +37,7 @@ TabWidget::TabWidget(QWidget *parent)
 }
 
 TabWidget::~TabWidget() {
+    setAcceptDrops(false);
     disconnect(mMenuButton, SIGNAL(clicked(bool)), this, SLOT(onMenuButtonClicked()));
     disconnect(this, SIGNAL(tabBarClicked(int)), this, SLOT(on_tabBarClicked(int)));
 }
@@ -104,8 +105,6 @@ void TabWidget::dropEvent(QDropEvent *event) {
         event->acceptProposedAction();
         event->accept();
         mDrawOverlay->setRect(QRect());
-        emit sourceTabWidget->checkIfEmptyContainer();
-        MainWindow::instance()->clearEmptyLayouts();
     }
 }
 
@@ -215,13 +214,17 @@ void TabWidget::on_tabBarClicked(int index) {
     qreal dpr = window()->windowHandle()->devicePixelRatio();
     QPixmap pixmap(tabBar()->tabRect(index).size() * dpr);
     pixmap.setDevicePixelRatio(dpr);
-    tabWidget->render(&pixmap);
+    render(&pixmap);
 
-    QDrag *drag = new QDrag(this);
+    QDrag* drag = new QDrag(this);
     drag->setMimeData(mimeData);
     drag->setPixmap(pixmap);
-    Qt::DropAction dropAction = drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction);
+    Qt::DropAction dropAction = drag->exec(Qt::MoveAction);
 
-//    if (dropAction == Qt::MoveAction)
+//    if (dropAction == Qt::MoveAction) {
 //        tabWidget->close();
+//    }
+
+    emit checkIfEmptyContainer();
+    MainWindow::instance()->clearEmptySplitters();
 }

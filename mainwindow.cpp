@@ -114,7 +114,7 @@ void MainWindow::splitTabWidget(
         newSplitter->setSizes({splitterPos, splitterPos});
         targetSplitter->setSizes(targetSizes);
 
-        // new splitter is added to a vector so that they can all be easily managed and cleaned.
+        // new splitter is added to a vector so that they can all be easily managed and removed.
         mSplitters.append(newSplitter);
     }
 }
@@ -134,7 +134,7 @@ Splitter *MainWindow::findSplitter(TabWidgetContainer& target, int& index) {
     return nullptr;
 }
 
-void MainWindow::clearEmptyLayouts() {
+void MainWindow::clearEmptySplitters() {
     QVector<Splitter*> splittersToRemove;
     for (Splitter* splitter : mSplitters) {
         if (!splitter || splitter->count() == 0) {
@@ -161,10 +161,9 @@ void MainWindow::onEmptyContainer(TabWidgetContainer* container) {
     int index;
     TabWidgetContainer& r_container = *container;
     Splitter* layout = findSplitter(r_container, index);
-    //layout->removeWidget(container);
 
     if (container) {
-        removeDockWidget(container);
+        container->deleteLater();
     }
 }
 

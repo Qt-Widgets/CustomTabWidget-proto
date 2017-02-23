@@ -29,7 +29,7 @@ public:
                         TabWidgetContainer* targetContainer,
                         utils::DropArea dropArea);
     Splitter* findSplitter(TabWidgetContainer &target, int &index);
-    void clearEmptyLayouts();
+    void clearEmptySplitters();
     void registerContainer(TabWidgetContainer* container);
     void unRegisterContainer(TabWidgetContainer* container);
     QString styleSheetFile() { return mStyleSheet; }
