@@ -40,10 +40,8 @@ MainWindow::MainWindow(QWidget *parent)
     //temp widgets
     Splitter* splitter = new Splitter(Qt::Horizontal);
     splitter->addWidget(new TabWidgetContainer(this));
-    splitter->addWidget(new TabWidgetContainer(this));
-    mLayouts.append(splitter);
+    mSplitters.append(splitter);
     setCentralWidget(splitter);
-    //ui->centralLayout->addWidget(splitter, 1);
 }
 
 MainWindow::~MainWindow() {
@@ -57,15 +55,13 @@ void MainWindow::splitTabWidget(
         , utils::DropArea dropArea)
 {
     //find splitter for the target widget.
-    int targetLayoutIndex;
-    int sourceLayoutIndex;
+    int targetSplitterIndex;
+    int sourceSplitterIndex;
     TabWidgetContainer& r_targetContainer = *targetContainer;
     TabWidgetContainer& r_sourceContainer = *sourceContainer;
-    Splitter* targetSplitter = findSplitter(r_targetContainer, targetLayoutIndex);
-    Splitter* sourceSplitter = findSplitter(r_sourceContainer, sourceLayoutIndex);
+    Splitter* targetSplitter = findSplitter(r_targetContainer, targetSplitterIndex);
+    Splitter* sourceSplitter = findSplitter(r_sourceContainer, sourceSplitterIndex);
     QList<int> targetSizes = targetSplitter->sizes();
-
-    //targetSplitterOrigPos = targetSplitter->get
 
     if (!targetSplitter) {
         qDebug() << "ERROR: Could not find splitter for the widget.";
@@ -77,24 +73,22 @@ void MainWindow::splitTabWidget(
     bool dropToRight = (dropArea == utils::BOTTOM || dropArea == utils::RIGHT);
 
     if (vertical == dropVertically) {
-        // inset to layout if layout.direction and dropArea direction are aligned
-        targetLayoutIndex = dropToRight ? targetLayoutIndex++ : targetLayoutIndex;
+        // insert to splitter if splitter.orientation and dropArea direction are aligned
+        // notice that this also means if vertical and dropVertically are both false.
+        targetSplitterIndex = dropToRight ? targetSplitterIndex + 1 : targetSplitterIndex;
 
         if (sourceContainer->hasOnlyOneTab()) {
-            targetSplitter->insertWidget(targetLayoutIndex, sourceContainer);
+            targetSplitter->insertWidget(targetSplitterIndex, sourceContainer);
         } else {
-            targetSplitter->insertWidget(targetLayoutIndex,
+            targetSplitter->insertWidget(targetSplitterIndex,
                                        new TabWidgetContainer(this, sourceContainer->tab(sourceTabIndex)));
         }
     } else {
         // Split Widget.
-        if (sourceContainer->hasOnlyOneTab() && targetSplitter == sourceSplitter && targetLayoutIndex == sourceLayoutIndex) {
+        if (sourceContainer->hasOnlyOneTab() && targetSplitter == sourceSplitter && targetSplitterIndex == sourceSplitterIndex) {
             // Cancel operation if trying to split self when there is only one tab.
             return;
         }
-
-        //targetLayout->removeWidget(targetContainer);
-        int dropIndex = dropToRight ? 1 : 0;
 
         // create new splitter in opposite direction of the targetSplitter.
         Qt::Orientation splitDirection = vertical ? Qt::Horizontal : Qt::Vertical;
@@ -102,7 +96,9 @@ void MainWindow::splitTabWidget(
         // add new splitter to target location
         Splitter* newSplitter = new Splitter();
         newSplitter->setOrientation(splitDirection);
-        targetSplitter->insertWidget(targetLayoutIndex, newSplitter);
+        targetSplitter->insertWidget(targetSplitterIndex, newSplitter);
+
+        int dropIndex = dropToRight ? targetSplitterIndex + 1 : targetSplitterIndex;
 
         // add target targetContainer and newContainer under the new splitter.
         newSplitter->addWidget(targetContainer);
@@ -114,17 +110,17 @@ void MainWindow::splitTabWidget(
         }
 
         // restore handle positions
-        int splitterPos = targetContainer->size().height() / 2.0;
+        int splitterPos = vertical ? targetContainer->size().height() / 2.0 : targetContainer->size().width() / 2.0;
         newSplitter->setSizes({splitterPos, splitterPos});
         targetSplitter->setSizes(targetSizes);
 
         // new splitter is added to a vector so that they can all be easily managed and cleaned.
-        mLayouts.append(newSplitter);
+        mSplitters.append(newSplitter);
     }
 }
 
 Splitter *MainWindow::findSplitter(TabWidgetContainer& target, int& index) {
-    for (Splitter* layout : mLayouts) {
+    for (Splitter* layout : mSplitters) {
         TabWidgetContainer* target_ptr = &target;
         int i = layout->indexOf(static_cast<QWidget*>(target_ptr));
         if (i < 0) {
@@ -139,16 +135,16 @@ Splitter *MainWindow::findSplitter(TabWidgetContainer& target, int& index) {
 }
 
 void MainWindow::clearEmptyLayouts() {
-    QVector<Splitter*> layoutsToRemove;
-    for (Splitter* layout : mLayouts) {
-        if (!layout || layout->count() == 0) {
-            layoutsToRemove.append(layout);
+    QVector<Splitter*> splittersToRemove;
+    for (Splitter* splitter : mSplitters) {
+        if (!splitter || splitter->count() == 0) {
+            splittersToRemove.append(splitter);
         }
     }
-    for (Splitter* layout : layoutsToRemove) {
-        mLayouts.removeOne(layout);
-        if (layout) {
-            layout->deleteLater();
+    for (Splitter* splitter : splittersToRemove) {
+        mSplitters.removeOne(splitter);
+        if (splitter) {
+            splitter->deleteLater();
         }
     }
 }

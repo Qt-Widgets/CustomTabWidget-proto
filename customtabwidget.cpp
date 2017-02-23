@@ -104,8 +104,8 @@ void TabWidget::dropEvent(QDropEvent *event) {
         event->acceptProposedAction();
         event->accept();
         mDrawOverlay->setRect(QRect());
-        //emit sourceTabWidget->checkIfEmptyContainer();
-        //MainWindow::instance()->clearEmptyLayouts();
+        emit sourceTabWidget->checkIfEmptyContainer();
+        MainWindow::instance()->clearEmptyLayouts();
     }
 }
 

@@ -40,7 +40,7 @@ public slots:
 
 private:
     Ui::MainWindow *ui;
-    QVector<Splitter*> mLayouts;
+    QVector<Splitter*> mSplitters;
     QString mStyleSheet;
     int mRunningCount = 0;
     QString loadFile(QString fileName);
