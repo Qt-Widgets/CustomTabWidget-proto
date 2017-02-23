@@ -8,5 +8,4 @@ class Splitter : public QSplitter
 public:
     explicit Splitter(QWidget *parent = 0);
     explicit Splitter(Qt::Orientation orientation, QWidget * parent = 0);
-    void setHandlePos(float location, int index);
 };
