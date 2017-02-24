@@ -23,16 +23,19 @@ TabWidgetContainer::TabWidgetContainer(QWidget *parent, QWidget* tab, QString ti
 
     mTabWidget.addTab(tab, title);
     setWidget(&mTabWidget);
-    connect(&mTabWidget, SIGNAL(checkIfEmptyContainer()), this, SLOT(onCheckIfEmptyContainer()));
+
+    //testIfEmpty signal is just passing trough.
+    connect(&mTabWidget, SIGNAL(testIfEmpty()), this, SIGNAL(testIfEmpty()));
+
     MainWindow::instance()->registerContainer(this);
 }
 
-bool TabWidgetContainer::hasOnlyOneTab() {
+bool TabWidgetContainer::hasOneTab() {
     return mTabWidget.tabBar()->count() == 1;
 }
 
-bool TabWidgetContainer::hasNoTabs() {
-    return mTabWidget.tabBar()->count() == 0;
+bool TabWidgetContainer::hasTabs() {
+    return mTabWidget.tabBar()->count() > 0;
 }
 
 QWidget *TabWidgetContainer::tab(int index) {
@@ -45,11 +48,4 @@ void TabWidgetContainer::insertTab(int index, QWidget *tab, const QString& label
 
 void TabWidgetContainer::addTab(QWidget *tab, const QString& label) {
     mTabWidget.addTab(tab, label);
-}
-
-void TabWidgetContainer::onCheckIfEmptyContainer() {
-    if (hasNoTabs()) {
-        qDebug() << "has no tabs";
-        emit emptyContainer(this);
-    }
 }

@@ -38,7 +38,7 @@ public:
     int getRunningNumber() { return mRunningCount++; }
 
 public slots:
-    void onEmptyContainer(TabWidgetContainer *container);
+    void onEmptyContainer();
 
 private:
     Ui::MainWindow *ui;

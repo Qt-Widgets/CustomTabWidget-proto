@@ -10,17 +10,16 @@ class TabWidgetContainer : public QDockWidget
 public:
     explicit TabWidgetContainer(QWidget *parent = 0, QWidget *tab = 0, QString title = "");
     virtual ~TabWidgetContainer() {}
-    bool hasOnlyOneTab();
-    bool hasNoTabs();
+    bool hasOneTab();
+    bool hasTabs();
+
+    // providing interface to tabWidget
     QWidget* tab(int index);
     void insertTab(int index, QWidget* tab, const QString& label);
     void addTab(QWidget* tab, const QString &label);
 
-public slots:
-    void onCheckIfEmptyContainer();
-
 signals:
-    void emptyContainer(TabWidgetContainer*);
+    void testIfEmpty();
 
 private:
     TabWidget mTabWidget;

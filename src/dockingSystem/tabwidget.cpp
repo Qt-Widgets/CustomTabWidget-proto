@@ -91,12 +91,6 @@ void TabWidget::dropEvent(QDropEvent *event) {
 
         if (mIndicatorArea == utils::DropArea::TABBAR) {
             insertTab(targetIndex, sourceWidget, tabTitle);
-
-            if (sourceTabWidget == this) {
-                qDebug() << "change tab order";
-            } else {
-                qDebug() << "move between two tabWidgets";
-            }
         } else {
             TabWidgetContainer* sourceContainer = static_cast<TabWidgetContainer*>(sourceTabWidget->parentWidget());
             TabWidgetContainer* targetContainer = static_cast<TabWidgetContainer*>(this->parentWidget());
@@ -222,6 +216,6 @@ void TabWidget::on_tabBarClicked(int index) {
     drag->setPixmap(pixmap);
     Qt::DropAction dropAction = drag->exec(Qt::MoveAction);
 
-    emit checkIfEmptyContainer();
+    emit testIfEmpty();
     MainWindow::instance()->clearEmptySplitters();
 }

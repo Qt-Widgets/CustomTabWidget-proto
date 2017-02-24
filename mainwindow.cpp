@@ -79,7 +79,7 @@ void MainWindow::splitTabWidget(
         // notice that this also means if vertical and dropVertically are both false.
         targetSplitterIndex = dropToRight ? targetSplitterIndex + 1 : targetSplitterIndex;
 
-        if (sourceContainer->hasOnlyOneTab()) {
+        if (sourceContainer->hasOneTab()) {
             targetSplitter->insertWidget(targetSplitterIndex, sourceContainer);
         } else {
             targetSplitter->insertWidget(targetSplitterIndex, new TabWidgetContainer(
@@ -89,7 +89,7 @@ void MainWindow::splitTabWidget(
         }
     } else {
         // Split Widget.
-        if (sourceContainer->hasOnlyOneTab() && targetSplitter == sourceSplitter && targetSplitterIndex == sourceSplitterIndex) {
+        if (sourceContainer->hasOneTab() && targetSplitter == sourceSplitter && targetSplitterIndex == sourceSplitterIndex) {
             // Cancel operation if trying to split self when there is only one tab.
             return;
         }
@@ -106,7 +106,7 @@ void MainWindow::splitTabWidget(
 
         // add target targetContainer and newContainer under the new splitter.
         newSplitter->addWidget(targetContainer);
-        if (sourceContainer->hasOnlyOneTab()) {
+        if (sourceContainer->hasOneTab()) {
             newSplitter->insertWidget(dropIndex, sourceContainer);
         } else {
             newSplitter->insertWidget(dropIndex, new TabWidgetContainer(MainWindow::instance(),
@@ -155,17 +155,17 @@ void MainWindow::clearEmptySplitters() {
 }
 
 void MainWindow::registerContainer(TabWidgetContainer *container) {
-    connect(container, SIGNAL(emptyContainer(TabWidgetContainer*)), this, SLOT(onEmptyContainer(TabWidgetContainer*)));
+    connect(container, SIGNAL(testIfEmpty()), this, SLOT(onEmptyContainer()));
 }
 
-void MainWindow::onEmptyContainer(TabWidgetContainer* container) {
-    int index;
-    TabWidgetContainer& r_container = *container;
-    Splitter* layout = findSplitter(r_container, index);
-
-    if (container) {
-        container->deleteLater();
+void MainWindow::onEmptyContainer() {
+    TabWidgetContainer* container = static_cast<TabWidgetContainer*>(sender());
+    if (!container || container->hasTabs()) {
+        return;
     }
+
+    // is empty container, so delete it.
+    container->deleteLater();
 }
 
 QString MainWindow::loadFile(QString fileName) {

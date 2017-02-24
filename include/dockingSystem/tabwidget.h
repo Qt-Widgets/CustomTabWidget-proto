@@ -28,7 +28,7 @@ private slots:
     void on_tabBarClicked(int index);
 
 signals:
-    void checkIfEmptyContainer();
+    void testIfEmpty();
 
 private:
     void updateIndicatorRect();
