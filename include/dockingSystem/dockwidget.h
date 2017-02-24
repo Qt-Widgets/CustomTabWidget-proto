@@ -21,7 +21,11 @@ public:
 signals:
     void testIfEmpty();
 
+private slots:
+    void onMenuButtonClicked();
+
 private:
     TabWidget mTabWidget;
+    QPushButton* mMenuButton;
 };
 

@@ -24,7 +24,6 @@ protected:
     void resizeEvent(QResizeEvent* event) override;
 
 private slots:
-    void onMenuButtonClicked();
     void on_tabBarClicked(int index);
 
 signals:
@@ -35,7 +34,6 @@ private:
     void updateIndicatorArea(QPoint& p);
 
 private:
-    QPushButton* mMenuButton;
     const int mIndicatorMargin = 10;
     utils::DropArea mIndicatorArea = utils::DropArea::INVALID;
     DrawOverlay* mDrawOverlay;

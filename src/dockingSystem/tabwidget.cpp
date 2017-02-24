@@ -20,26 +20,11 @@ TabWidget::TabWidget(QWidget *parent)
     setAcceptDrops(true);
     //setTabsClosable(true);
 
-    static QString style("QPushButton {"
-          "   background-color: #757575;"
-          "   padding-left: 4px;"
-          "   padding-right: 4px;"
-          "   padding-top: 2px;"
-          "   padding-bottom: 2px;"
-          "}");
-
-    mMenuButton = new QPushButton("+", this);
-    mMenuButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    mMenuButton->setStyleSheet(style);
-    setCornerWidget(mMenuButton);
-
-    connect(mMenuButton, SIGNAL(clicked(bool)), this, SLOT(onMenuButtonClicked()));
     connect(this, SIGNAL(tabBarClicked(int)), this, SLOT(on_tabBarClicked(int)));
 }
 
 TabWidget::~TabWidget() {
     setAcceptDrops(false);
-    disconnect(mMenuButton, SIGNAL(clicked(bool)), this, SLOT(onMenuButtonClicked()));
     disconnect(this, SIGNAL(tabBarClicked(int)), this, SLOT(on_tabBarClicked(int)));
 }
 
@@ -185,11 +170,6 @@ void TabWidget::updateIndicatorRect() {
 
         mDrawOverlay->setRect(rect);
     }
-}
-
-void TabWidget::onMenuButtonClicked() {
-    int runningNumber = MainWindow::instance()->getRunningNumber();
-    addTab(new QFrame(this), QString("tab").append(QString::number(runningNumber)));
 }
 
 void TabWidget::on_tabBarClicked(int index) {
