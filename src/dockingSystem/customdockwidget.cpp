@@ -1,8 +1,9 @@
-#include "customdockwidget.h"
-#include <customtabwidget.h>
 #include <QTabBar>
 #include <mainwindow.h>
 #include <QDebug>
+
+#include <include/dockingSystem/customtabwidget.h>
+#include <include/dockingSystem/customdockwidget.h>
 
 TabWidgetContainer::TabWidgetContainer(QWidget *parent, QWidget* tab, QString title)
     : QDockWidget(parent)
@@ -17,20 +18,13 @@ TabWidgetContainer::TabWidgetContainer(QWidget *parent, QWidget* tab, QString ti
 
     if (title == "") {
         //temp add some dummy title
-        QString("tab").append(QString::number(MainWindow::instance()->getRunningNumber()));
+        title = QString("tab").append(QString::number(MainWindow::instance()->getRunningNumber()));
     }
 
     mTabWidget.addTab(tab, title);
-
     setWidget(&mTabWidget);
-
     connect(&mTabWidget, SIGNAL(checkIfEmptyContainer()), this, SLOT(onCheckIfEmptyContainer()));
     MainWindow::instance()->registerContainer(this);
-}
-
-TabWidgetContainer::~TabWidgetContainer() {
-    disconnect(&mTabWidget, SIGNAL(checkIfEmptyContainer()), this, SLOT(onCheckIfEmptyContainer()));
-    MainWindow::instance()->unRegisterContainer(this);
 }
 
 bool TabWidgetContainer::hasOnlyOneTab() {

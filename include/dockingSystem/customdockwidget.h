@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QDockWidget>
-#include <customtabwidget.h>
+#include <include/dockingSystem/customtabwidget.h>
 
 class TabWidgetContainer : public QDockWidget
 {
@@ -9,7 +9,7 @@ class TabWidgetContainer : public QDockWidget
 
 public:
     explicit TabWidgetContainer(QWidget *parent = 0, QWidget *tab = 0, QString title = "");
-    virtual ~TabWidgetContainer();
+    virtual ~TabWidgetContainer() {}
     bool hasOnlyOneTab();
     bool hasNoTabs();
     QWidget* tab(int index);

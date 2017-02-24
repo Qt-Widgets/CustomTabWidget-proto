@@ -1,12 +1,13 @@
-#include "customtabwidget.h"
 #include <QTabBar>
 #include <QDragMoveEvent>
-#include <qdebug.h>
+#include <QDebug>
 #include <QDrag>
 #include <QMimeData>
 #include <QWindow>
-#include <mainwindow.h>
 #include <assert.h>
+
+#include <mainwindow.h>
+#include <include/dockingSystem/customtabwidget.h>
 
 static QString sourceIndexMimeDataKey() { return QStringLiteral("source/index"); }
 static QString sourceTabTitleMimeDataKey() { return QStringLiteral("source/tabtitle"); }

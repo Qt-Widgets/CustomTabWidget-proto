@@ -1,9 +1,10 @@
-#include "customtabwidget.h"
+#include <include/dockingSystem/customtabwidget.h>
+#include <include/dockingSystem/customdockwidget.h>
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QStyleFactory>
 #include <QGuiApplication>
-#include <customdockwidget.h>
 #include <QDebug>
 #include <assert.h>
 #include <QResource>
@@ -155,10 +156,6 @@ void MainWindow::clearEmptySplitters() {
 
 void MainWindow::registerContainer(TabWidgetContainer *container) {
     connect(container, SIGNAL(emptyContainer(TabWidgetContainer*)), this, SLOT(onEmptyContainer(TabWidgetContainer*)));
-}
-
-void MainWindow::unRegisterContainer(TabWidgetContainer *container) {
-    disconnect(container, SIGNAL(emptyContainer(TabWidgetContainer*)), this, SLOT(onEmptyContainer(TabWidgetContainer*)));
 }
 
 void MainWindow::onEmptyContainer(TabWidgetContainer* container) {

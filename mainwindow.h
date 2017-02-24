@@ -2,9 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <customdockwidget.h>
+
+#include <include/dockingSystem/splitter.h>
+#include <include/dockingSystem/customdockwidget.h>
 #include <utils.h>
-#include <splitter.h>
 
 namespace Ui {
 class MainWindow;
@@ -34,7 +35,7 @@ public:
     void registerContainer(TabWidgetContainer* container);
     void unRegisterContainer(TabWidgetContainer* container);
     QString styleSheetFile() { return mStyleSheet; }
-    int getRunningNumber() { return ++mRunningCount; }
+    int getRunningNumber() { return mRunningCount++; }
 
 public slots:
     void onEmptyContainer(TabWidgetContainer *container);
