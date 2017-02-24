@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QDockWidget>
-#include <include/dockingSystem/customtabwidget.h>
+#include <include/dockingSystem/tabwidget.h>
 
 class TabWidgetContainer : public QDockWidget
 {

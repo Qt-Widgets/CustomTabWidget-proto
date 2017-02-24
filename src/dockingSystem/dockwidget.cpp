@@ -2,8 +2,8 @@
 #include <mainwindow.h>
 #include <QDebug>
 
-#include <include/dockingSystem/customtabwidget.h>
-#include <include/dockingSystem/customdockwidget.h>
+#include <include/dockingSystem/tabwidget.h>
+#include <include/dockingSystem/dockwidget.h>
 
 TabWidgetContainer::TabWidgetContainer(QWidget *parent, QWidget* tab, QString title)
     : QDockWidget(parent)

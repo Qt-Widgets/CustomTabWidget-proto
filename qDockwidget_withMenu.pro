@@ -14,17 +14,17 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    src/dockingSystem/customdockwidget.cpp \
-    src/dockingSystem/customtabwidget.cpp \
     src/dockingSystem/drawoverlay.cpp \
-    src/dockingSystem/splitter.cpp
+    src/dockingSystem/splitter.cpp \
+    src/dockingSystem/dockwidget.cpp \
+    src/dockingSystem/tabwidget.cpp
 
 HEADERS  += mainwindow.h \
-    include/dockingSystem/customdockwidget.h \
-    include/dockingSystem/customtabwidget.h \
     include/dockingSystem/drawoverlay.h \
     utils.h \
-    include/dockingSystem/splitter.h
+    include/dockingSystem/splitter.h \
+    include/dockingSystem/dockwidget.h \
+    include/dockingSystem/tabwidget.h
 
 FORMS    += mainwindow.ui
 

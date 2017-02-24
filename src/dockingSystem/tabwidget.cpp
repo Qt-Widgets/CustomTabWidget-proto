@@ -7,7 +7,7 @@
 #include <assert.h>
 
 #include <mainwindow.h>
-#include <include/dockingSystem/customtabwidget.h>
+#include <include/dockingSystem/tabwidget.h>
 
 static QString sourceIndexMimeDataKey() { return QStringLiteral("source/index"); }
 static QString sourceTabTitleMimeDataKey() { return QStringLiteral("source/tabtitle"); }
