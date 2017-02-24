@@ -4,18 +4,23 @@
 #include <mainwindow.h>
 #include <QDebug>
 
-TabWidgetContainer::TabWidgetContainer(QWidget *parent, QWidget* tab)
+TabWidgetContainer::TabWidgetContainer(QWidget *parent, QWidget* tab, QString title)
     : QDockWidget(parent)
 {
     setFeatures(NoDockWidgetFeatures);
     setTitleBarWidget(new QWidget(this));
 
-    //temp add some dummy tabs
     if (!tab) {
+        //temp add some dummy tabs
         tab = new QWidget(this);
     }
-    int runningNumber = MainWindow::instance()->getRunningNumber();
-    mTabWidget.addTab(tab, QString("tab").append(QString::number(runningNumber)));
+
+    if (title == "") {
+        //temp add some dummy title
+        QString("tab").append(QString::number(MainWindow::instance()->getRunningNumber()));
+    }
+
+    mTabWidget.addTab(tab, title);
 
     setWidget(&mTabWidget);
 

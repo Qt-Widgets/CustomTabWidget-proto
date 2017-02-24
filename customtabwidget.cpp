@@ -63,7 +63,7 @@ void TabWidget::dragEnterEvent(QDragEnterEvent* event) {
     if (event->mimeData()->hasText()) {
         mDrawOverlay->setRect(this->rect());
         if (event->source() == this) {
-            event->setDropAction(Qt::MoveAction);
+            //event->setDropAction(Qt::MoveAction);
             event->accept();
         } else {
             event->acceptProposedAction();
@@ -99,7 +99,7 @@ void TabWidget::dropEvent(QDropEvent *event) {
         } else {
             TabWidgetContainer* sourceContainer = static_cast<TabWidgetContainer*>(sourceTabWidget->parentWidget());
             TabWidgetContainer* targetContainer = static_cast<TabWidgetContainer*>(this->parentWidget());
-            MainWindow::instance()->splitTabWidget(sourceIndex, sourceContainer, targetContainer, mIndicatorArea);
+            MainWindow::instance()->splitTabWidget(sourceIndex, sourceContainer, targetContainer, mIndicatorArea, tabTitle);
         }
 
         event->acceptProposedAction();
@@ -220,10 +220,6 @@ void TabWidget::on_tabBarClicked(int index) {
     drag->setMimeData(mimeData);
     drag->setPixmap(pixmap);
     Qt::DropAction dropAction = drag->exec(Qt::MoveAction);
-
-//    if (dropAction == Qt::MoveAction) {
-//        tabWidget->close();
-//    }
 
     emit checkIfEmptyContainer();
     MainWindow::instance()->clearEmptySplitters();

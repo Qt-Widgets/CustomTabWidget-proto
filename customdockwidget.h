@@ -8,8 +8,8 @@ class TabWidgetContainer : public QDockWidget
     Q_OBJECT
 
 public:
-    explicit TabWidgetContainer(QWidget *parent = 0, QWidget *tab = 0);
-    ~TabWidgetContainer();
+    explicit TabWidgetContainer(QWidget *parent = 0, QWidget *tab = 0, QString title = "");
+    virtual ~TabWidgetContainer();
     bool hasOnlyOneTab();
     bool hasNoTabs();
     QWidget* tab(int index);

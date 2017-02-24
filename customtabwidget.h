@@ -5,12 +5,14 @@
 #include <utils.h>
 #include <drawoverlay.h>
 
+class QDrag;
+
 class TabWidget : public QTabWidget
 {
     Q_OBJECT
 public:
     explicit TabWidget(QWidget *parent = 0);
-    ~TabWidget();
+    virtual ~TabWidget();
 
 protected:
     void dragMoveEvent(QDragMoveEvent* event) override;

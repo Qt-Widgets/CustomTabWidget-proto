@@ -27,7 +27,8 @@ public:
     void splitTabWidget(int sourceTabIndex,
                         TabWidgetContainer* sourceContainer,
                         TabWidgetContainer* targetContainer,
-                        utils::DropArea dropArea);
+                        utils::DropArea dropArea,
+                        QString tabTitle);
     Splitter* findSplitter(TabWidgetContainer &target, int &index);
     void clearEmptySplitters();
     void registerContainer(TabWidgetContainer* container);

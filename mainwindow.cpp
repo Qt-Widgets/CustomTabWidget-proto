@@ -52,7 +52,8 @@ void MainWindow::splitTabWidget(
           int sourceTabIndex
         , TabWidgetContainer* sourceContainer
         , TabWidgetContainer* targetContainer
-        , utils::DropArea dropArea)
+        , utils::DropArea dropArea
+        , QString tabTitle)
 {
     //find splitter for the target widget.
     int targetSplitterIndex;
@@ -80,8 +81,10 @@ void MainWindow::splitTabWidget(
         if (sourceContainer->hasOnlyOneTab()) {
             targetSplitter->insertWidget(targetSplitterIndex, sourceContainer);
         } else {
-            targetSplitter->insertWidget(targetSplitterIndex,
-                                       new TabWidgetContainer(this, sourceContainer->tab(sourceTabIndex)));
+            targetSplitter->insertWidget(targetSplitterIndex, new TabWidgetContainer(
+                                             this,
+                                             sourceContainer->tab(sourceTabIndex),
+                                             tabTitle));
         }
     } else {
         // Split Widget.
@@ -106,7 +109,8 @@ void MainWindow::splitTabWidget(
             newSplitter->insertWidget(dropIndex, sourceContainer);
         } else {
             newSplitter->insertWidget(dropIndex, new TabWidgetContainer(MainWindow::instance(),
-                                                                      sourceContainer->tab(sourceTabIndex)));
+                                                                      sourceContainer->tab(sourceTabIndex),
+                                                                      tabTitle));
         }
 
         // restore handle positions
