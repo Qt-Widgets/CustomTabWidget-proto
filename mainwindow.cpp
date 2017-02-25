@@ -124,16 +124,16 @@ void MainWindow::splitTabWidget(
     }
 }
 
-Splitter *MainWindow::findSplitter(TabWidgetContainer& target, int& index) {
-    for (Splitter* layout : mSplitters) {
+Splitter* MainWindow::findSplitter(TabWidgetContainer& target, int& index) {
+    for (Splitter* splitter : mSplitters) {
         TabWidgetContainer* target_ptr = &target;
-        int i = layout->indexOf(static_cast<QWidget*>(target_ptr));
+        int i = splitter->indexOf(static_cast<QWidget*>(target_ptr));
         if (i < 0) {
-            //target not found in this layout
+            //target not found in this splitter
             continue;
         } else {
             index = i;
-            return layout;
+            return splitter;
         }
     }
     return nullptr;
@@ -149,16 +149,9 @@ void MainWindow::onEmptyContainer() {
         return;
     }
 
-    // finds the parent splitter
-    Splitter* parentSplitter = nullptr;
-    for (Splitter* splitter : mSplitters) {
-        for (auto* childWidget : splitter->getWidgets()) {
-            if (childWidget == container) {
-                parentSplitter = splitter;
-                break;
-            }
-        }
-    }
+    int index = 0;
+    TabWidgetContainer& r_container = *container;
+    Splitter* parentSplitter = findSplitter(r_container, index);
 
     // is empty container, so delete it.
     container->deleteLater();
