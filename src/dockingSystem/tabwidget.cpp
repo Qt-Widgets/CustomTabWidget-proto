@@ -197,5 +197,4 @@ void TabWidget::on_tabBarClicked(int index) {
     Qt::DropAction dropAction = drag->exec(Qt::MoveAction);
 
     emit testIfEmpty();
-    MainWindow::instance()->clearEmptySplitters();
 }

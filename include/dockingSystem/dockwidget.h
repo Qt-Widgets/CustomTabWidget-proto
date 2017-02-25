@@ -23,6 +23,8 @@ signals:
 
 private slots:
     void onMenuButtonClicked();
+    void onAction_addTab();
+    void onAction_setFloating();
 
 private:
     TabWidget mTabWidget;

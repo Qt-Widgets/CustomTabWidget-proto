@@ -1,6 +1,8 @@
 #include <QTabBar>
 #include <mainwindow.h>
 #include <QDebug>
+#include <QMenu>
+#include <QAction>
 
 #include <include/dockingSystem/tabwidget.h>
 #include <include/dockingSystem/dockwidget.h>
@@ -65,6 +67,32 @@ void TabWidgetContainer::addTab(QWidget *tab, const QString& label) {
 }
 
 void TabWidgetContainer::onMenuButtonClicked() {
+    QMenu contextMenu(tr("Context menu"), this);
+
+    //add tab
+    QAction action1("Add Tab", this);
+    connect(&action1, SIGNAL(triggered()), this, SLOT(onAction_addTab()));
+    contextMenu.addAction(&action1);
+
+    //set floating
+    QAction action2("Float", this);
+    connect(&action2, SIGNAL(triggered()), this, SLOT(onAction_setFloating()));
+    contextMenu.addAction(&action2);
+
+    //create the menu below the button
+    QPoint pos = mMenuButton->pos();
+    pos.setY(pos.y() + mMenuButton->height());
+    contextMenu.exec(mapToGlobal(pos));
+}
+
+void TabWidgetContainer::onAction_addTab() {
     int runningNumber = MainWindow::instance()->getRunningNumber();
     addTab(new QFrame(this), QString("tab").append(QString::number(runningNumber)));
+}
+
+void TabWidgetContainer::onAction_setFloating() {
+    setFloating(true);
+
+    emit testIfEmpty();
+    //MainWindow::instance()->clearEmptySplitters();
 }

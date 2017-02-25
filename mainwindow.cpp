@@ -139,21 +139,6 @@ Splitter *MainWindow::findSplitter(TabWidgetContainer& target, int& index) {
     return nullptr;
 }
 
-void MainWindow::clearEmptySplitters() {
-    QVector<Splitter*> splittersToRemove;
-    for (Splitter* splitter : mSplitters) {
-        if (!splitter || splitter->count() == 0) {
-            splittersToRemove.append(splitter);
-        }
-    }
-    for (Splitter* splitter : splittersToRemove) {
-        mSplitters.removeOne(splitter);
-        if (splitter) {
-            splitter->deleteLater();
-        }
-    }
-}
-
 void MainWindow::registerContainer(TabWidgetContainer *container) {
     connect(container, SIGNAL(testIfEmpty()), this, SLOT(onEmptyContainer()));
 }
@@ -164,8 +149,27 @@ void MainWindow::onEmptyContainer() {
         return;
     }
 
+    // finds the parent splitter
+    Splitter* parentSplitter = nullptr;
+    for (Splitter* splitter : mSplitters) {
+        for (auto* childWidget : splitter->getWidgets()) {
+            if (childWidget == container) {
+                parentSplitter = splitter;
+                break;
+            }
+        }
+    }
+
     // is empty container, so delete it.
     container->deleteLater();
+
+    if (parentSplitter) {
+        if (parentSplitter->getWidgets().count() <= 1) {
+            // parentSplitter is empty, so delete it.
+            mSplitters.removeOne(parentSplitter);
+            parentSplitter->deleteLater();
+        }
+    }
 }
 
 QString MainWindow::loadFile(QString fileName) {

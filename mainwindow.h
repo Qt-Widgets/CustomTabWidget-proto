@@ -31,7 +31,6 @@ public:
                         utils::DropArea dropArea,
                         QString tabTitle);
     Splitter* findSplitter(TabWidgetContainer &target, int &index);
-    void clearEmptySplitters();
     void registerContainer(TabWidgetContainer* container);
     void unRegisterContainer(TabWidgetContainer* container);
     QString styleSheetFile() { return mStyleSheet; }
