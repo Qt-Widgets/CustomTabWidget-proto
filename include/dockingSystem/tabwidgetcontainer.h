@@ -17,6 +17,7 @@ public:
     QWidget* tab(int index);
     void insertTab(int index, QWidget* tab, const QString& label);
     void addTab(QWidget* tab, const QString &label);
+    int getRunningNumber() { return mRunningCount++; }
 
 signals:
     void testIfEmpty();
@@ -29,5 +30,6 @@ private slots:
 private:
     TabWidget mTabWidget;
     QPushButton* mMenuButton;
+    int mRunningCount = 0;
 };
 

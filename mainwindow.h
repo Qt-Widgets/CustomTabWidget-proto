@@ -5,6 +5,7 @@
 
 #include <include/dockingSystem/splitter.h>
 #include <include/dockingSystem/tabwidgetcontainer.h>
+#include <include/dockingSystem/splittermanager.h>
 #include <utils.h>
 
 namespace Ui {
@@ -17,6 +18,7 @@ class MainWindow : public QMainWindow
 
 private:
     static MainWindow* sInstance;
+    static SplitterManager* sSplitterManager;
 
 public:
     MainWindow(QWidget *parent = 0);
@@ -24,26 +26,12 @@ public:
 
 public:
     static MainWindow* instance();
-
-    void splitTabWidget(int sourceTabIndex,
-                        TabWidgetContainer* sourceContainer,
-                        TabWidgetContainer* targetContainer,
-                        utils::DropArea dropArea,
-                        QString tabTitle);
-    Splitter* findSplitter(TabWidgetContainer &target, int &index);
-    void registerContainer(TabWidgetContainer* container);
-    void unRegisterContainer(TabWidgetContainer* container);
+    static SplitterManager* splitterManager();
     QString styleSheetFile() { return mStyleSheet; }
-    int getRunningNumber() { return mRunningCount++; }
-
-public slots:
-    void onEmptyContainer();
 
 private:
     Ui::MainWindow *ui;
-    QVector<Splitter*> mSplitters;
     QString mStyleSheet;
-    int mRunningCount = 0;
     QString loadFile(QString fileName);
 };
 

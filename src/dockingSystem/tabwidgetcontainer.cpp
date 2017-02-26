@@ -20,7 +20,7 @@ TabWidgetContainer::TabWidgetContainer(QWidget *parent, QWidget* tab, QString ti
 
     if (title == "") {
         //temp add some dummy title
-        title = QString("tab").append(QString::number(MainWindow::instance()->getRunningNumber()));
+        title = QString("tab").append(QString::number(getRunningNumber()));
     }
 
     mTabWidget.addTab(tab, title);
@@ -43,7 +43,7 @@ TabWidgetContainer::TabWidgetContainer(QWidget *parent, QWidget* tab, QString ti
     connect(&mTabWidget, SIGNAL(testIfEmpty()), this, SIGNAL(testIfEmpty()));
 
     connect(mMenuButton, SIGNAL(clicked(bool)), this, SLOT(onMenuButtonClicked()));
-    MainWindow::instance()->registerContainer(this);
+    MainWindow::splitterManager()->registerContainer(this);
 }
 
 bool TabWidgetContainer::hasOneTab() {
@@ -86,8 +86,7 @@ void TabWidgetContainer::onMenuButtonClicked() {
 }
 
 void TabWidgetContainer::onAction_addTab() {
-    int runningNumber = MainWindow::instance()->getRunningNumber();
-    addTab(new QFrame(this), QString("tab").append(QString::number(runningNumber)));
+    addTab(new QFrame(this), QString("tab").append(QString::number(getRunningNumber())));
 }
 
 void TabWidgetContainer::onAction_setFloating() {

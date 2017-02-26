@@ -79,7 +79,7 @@ void TabWidget::dropEvent(QDropEvent *event) {
         } else {
             TabWidgetContainer* sourceContainer = static_cast<TabWidgetContainer*>(sourceTabWidget->parentWidget());
             TabWidgetContainer* targetContainer = static_cast<TabWidgetContainer*>(this->parentWidget());
-            MainWindow::instance()->splitTabWidget(sourceIndex, sourceContainer, targetContainer, mIndicatorArea, tabTitle);
+            MainWindow::splitterManager()->splitTabWidget(sourceIndex, sourceContainer, targetContainer, mIndicatorArea, tabTitle);
         }
 
         event->acceptProposedAction();
