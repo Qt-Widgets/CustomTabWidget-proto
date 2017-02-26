@@ -93,5 +93,4 @@ void TabWidgetContainer::onAction_setFloating() {
     setFloating(true);
 
     emit testIfEmpty();
-    //MainWindow::instance()->clearEmptySplitters();
 }

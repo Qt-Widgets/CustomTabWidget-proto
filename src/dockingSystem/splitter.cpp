@@ -33,8 +33,8 @@ QList<Splitter*> Splitter::getSplitters() {
     QList<Splitter*> splitters;
     for (QWidget* item : widgets) {
         Splitter* splitter = static_cast<Splitter*>(item);
-        if (splitter) {
-            splitters.append(item);
+        if (splitter) {;
+            splitters.append(splitter);
         }
     }
     return splitters;

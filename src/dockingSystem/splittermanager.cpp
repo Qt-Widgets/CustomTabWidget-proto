@@ -20,6 +20,7 @@ void SplitterManager::registerContainer(TabWidgetContainer *container) {
 Splitter *SplitterManager::createSplitter() {
     Splitter* splitter = new Splitter();
     mSplitters.append(splitter);
+    return splitter;
 }
 
 void SplitterManager::deleteSplitter(Splitter *splitter) {
@@ -34,8 +35,7 @@ void SplitterManager::deleteEmptySplitter(Splitter* itemToDelete) {
 
     Splitter* parent = nullptr;
     for (Splitter* splitter : mSplitters) {
-        Splitter* target_ptr = &itemToDelete;
-        int i = splitter->indexOf(static_cast<QWidget*>(target_ptr));
+        int i = splitter->indexOf(static_cast<QWidget*>(itemToDelete));
         if (i > 0) {
             //container's splitter found
             parent = splitter;
