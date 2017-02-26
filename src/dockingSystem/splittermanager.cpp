@@ -17,6 +17,54 @@ void SplitterManager::registerContainer(TabWidgetContainer *container) {
     connect(container, SIGNAL(testIfEmpty()), this, SLOT(onEmptyContainer()));
 }
 
+Splitter *SplitterManager::createSplitter() {
+    Splitter* splitter = new Splitter();
+    mSplitters.append(splitter);
+}
+
+void SplitterManager::deleteSplitter(Splitter *splitter) {
+    mSplitters.removeOne(splitter);
+    splitter->deleteLater();
+}
+
+void SplitterManager::deleteEmptySplitter(Splitter* itemToDelete) {
+    if (!itemToDelete) {
+        return;
+    }
+
+    Splitter* parent = nullptr;
+    for (Splitter* splitter : mSplitters) {
+        Splitter* target_ptr = &itemToDelete;
+        int i = splitter->indexOf(static_cast<QWidget*>(target_ptr));
+        if (i > 0) {
+            //container's splitter found
+            parent = splitter;
+            break;
+        }
+    }
+
+    if (!parent) {
+        return;
+    }
+
+    bool hasContainers = itemToDelete->hasContainers();
+    if (hasContainers) {
+        //do not delete if itemToDelete has containers.
+        return;
+    }
+
+    QList<Splitter*> splitters = itemToDelete->getSplitters();
+    if (splitters.count() > 1) {
+        //do not delete if itemToDelete has more than one splitters
+        return;
+    } else if (splitters.count() == 1) {
+        //move child splitter directly under the parent splitter.
+        parent->addWidget(splitters.first());
+    }
+
+    itemToDelete->deleteLater();
+}
+
 void SplitterManager::onEmptyContainer() {
     TabWidgetContainer* container = static_cast<TabWidgetContainer*>(sender());
     if (!container || container->hasTabs()) {
@@ -31,10 +79,10 @@ void SplitterManager::onEmptyContainer() {
     container->deleteLater();
 
     if (parentSplitter) {
+        //count <= 1 because this container has not been deleted yet.
         if (parentSplitter->getWidgets().count() <= 1) {
             // parentSplitter is empty, so delete it.
-            mSplitters.removeOne(parentSplitter);
-            parentSplitter->deleteLater();
+            deleteSplitter(parentSplitter);
         }
     }
 }
@@ -88,7 +136,7 @@ void SplitterManager::splitTabWidget(
         Qt::Orientation splitDirection = vertical ? Qt::Horizontal : Qt::Vertical;
 
         // add new splitter to target location
-        Splitter* newSplitter = new Splitter();
+        Splitter* newSplitter = createSplitter();
         newSplitter->setOrientation(splitDirection);
         targetSplitter->insertWidget(targetSplitterIndex, newSplitter);
 
@@ -108,9 +156,6 @@ void SplitterManager::splitTabWidget(
         int splitterPos = vertical ? targetContainer->size().height() / 2.0 : targetContainer->size().width() / 2.0;
         newSplitter->setSizes({splitterPos, splitterPos});
         targetSplitter->setSizes(targetSizes);
-
-        // new splitter is added to a vector so that they can all be easily managed and removed.
-        mSplitters.append(newSplitter);
     }
 }
 
@@ -122,6 +167,7 @@ Splitter* SplitterManager::findSplitter(TabWidgetContainer& target, int& index) 
             //target not found in this splitter
             continue;
         } else {
+            //container's splitter found
             index = i;
             return splitter;
         }

@@ -16,3 +16,28 @@ QList<QWidget*> Splitter::getWidgets() {
     }
     return widgets;
 }
+
+bool Splitter::hasContainers() {
+    QList<QWidget*> widgets = getWidgets();
+    for (QWidget* item : widgets) {
+        TabWidgetContainer* container = static_cast<TabWidgetContainer*>(item);
+        if (container) {
+            return true;
+        }
+    }
+    return false;
+}
+
+QList<Splitter*> Splitter::getSplitters() {
+    QList<QWidget*> widgets = getWidgets();
+    QList<Splitter*> splitters;
+    for (QWidget* item : widgets) {
+        Splitter* splitter = static_cast<Splitter*>(item);
+        if (splitter) {
+            splitters.append(item);
+        }
+    }
+    return splitters;
+}
+
+

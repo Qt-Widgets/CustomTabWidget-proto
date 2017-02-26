@@ -181,6 +181,8 @@ void TabWidget::on_tabBarClicked(int index) {
         return;
     }
 
+    //todo: only proceed if drag distance is above certain treshold.
+
     QMimeData *mimeData = new QMimeData;
     mimeData->setText(tabWidget->objectName());
     mimeData->setData(sourceTabTitleMimeDataKey(), QByteArray::fromStdString(tabText(index).toStdString()));
