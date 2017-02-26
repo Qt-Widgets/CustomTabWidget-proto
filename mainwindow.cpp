@@ -1,5 +1,5 @@
 #include <include/dockingSystem/tabwidget.h>
-#include <include/dockingSystem/dockwidget.h>
+#include <include/dockingSystem/tabwidgetcontainer.h>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"

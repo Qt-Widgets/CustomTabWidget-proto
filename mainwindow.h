@@ -4,7 +4,7 @@
 #include <QMainWindow>
 
 #include <include/dockingSystem/splitter.h>
-#include <include/dockingSystem/dockwidget.h>
+#include <include/dockingSystem/tabwidgetcontainer.h>
 #include <utils.h>
 
 namespace Ui {

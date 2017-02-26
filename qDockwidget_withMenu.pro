@@ -16,17 +16,17 @@ SOURCES += main.cpp\
     mainwindow.cpp \
     src/dockingSystem/drawoverlay.cpp \
     src/dockingSystem/splitter.cpp \
-    src/dockingSystem/dockwidget.cpp \
     src/dockingSystem/tabwidget.cpp \
-    src/dockingSystem/splittermanager.cpp
+    src/dockingSystem/splittermanager.cpp \
+    src/dockingSystem/tabwidgetcontainer.cpp
 
 HEADERS  += mainwindow.h \
     utils.h \
     include/dockingSystem/drawoverlay.h \
     include/dockingSystem/splitter.h \
-    include/dockingSystem/dockwidget.h \
     include/dockingSystem/tabwidget.h \
-    include/dockingSystem/splittermanager.h
+    include/dockingSystem/splittermanager.h \
+    include/dockingSystem/tabwidgetcontainer.h
 
 FORMS    += mainwindow.ui
 

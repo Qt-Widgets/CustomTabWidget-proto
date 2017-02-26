@@ -5,7 +5,7 @@
 #include <QAction>
 
 #include <include/dockingSystem/tabwidget.h>
-#include <include/dockingSystem/dockwidget.h>
+#include <include/dockingSystem/tabwidgetcontainer.h>
 
 TabWidgetContainer::TabWidgetContainer(QWidget *parent, QWidget* tab, QString title)
     : QDockWidget(parent)

@@ -1,11 +1,7 @@
-#ifndef SPLITTERMANAGER_H
-#define SPLITTERMANAGER_H
-
+#pragma once
 
 class SplitterManager
 {
 public:
     SplitterManager();
 };
-
-#endif // SPLITTERMANAGER_H
