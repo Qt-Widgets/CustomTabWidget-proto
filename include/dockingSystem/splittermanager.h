@@ -12,7 +12,6 @@ class SplitterManager : public QWidget
 public:
     SplitterManager(QWidget *parent = 0);
     void registerContainer(TabWidgetContainer* container);
-    void unRegisterContainer(TabWidgetContainer* container);
     Splitter* createSplitter();
     void deleteSplitter(Splitter* splitter);
     void deleteEmptySplitter(Splitter *itemToDelete);
