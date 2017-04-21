@@ -28,42 +28,42 @@ void SplitterManager::deleteSplitter(Splitter *splitter) {
     splitter->deleteLater();
 }
 
-void SplitterManager::deleteEmptySplitter(Splitter* itemToDelete) {
-    if (!itemToDelete) {
-        return;
-    }
+//void SplitterManager::deleteEmptySplitter(Splitter* itemToDelete) {
+//    if (!itemToDelete) {
+//        return;
+//    }
 
-    Splitter* parent = nullptr;
-    for (Splitter* splitter : mSplitters) {
-        int i = splitter->indexOf(static_cast<QWidget*>(itemToDelete));
-        if (i > 0) {
-            //container's splitter found
-            parent = splitter;
-            break;
-        }
-    }
+//    Splitter* parent = nullptr;
+//    for (Splitter* splitter : mSplitters) {
+//        int i = splitter->indexOf(static_cast<QWidget*>(itemToDelete));
+//        if (i > 0) {
+//            //container's splitter found
+//            parent = splitter;
+//            break;
+//        }
+//    }
 
-    if (!parent) {
-        return;
-    }
+//    if (!parent) {
+//        return;
+//    }
 
-    bool hasContainers = itemToDelete->hasContainers();
-    if (hasContainers) {
-        //do not delete if itemToDelete has containers.
-        return;
-    }
+//    bool hasContainers = itemToDelete->hasContainers();
+//    if (hasContainers) {
+//        //do not delete if itemToDelete has containers.
+//        return;
+//    }
 
-    QList<Splitter*> splitters = itemToDelete->getSplitters();
-    if (splitters.count() > 1) {
-        //do not delete if itemToDelete has more than one splitters
-        return;
-    } else if (splitters.count() == 1) {
-        //move child splitter directly under the parent splitter.
-        parent->addWidget(splitters.first());
-    }
+//    QList<Splitter*> splitters = itemToDelete->getSplitters();
+//    if (splitters.count() > 1) {
+//        //do not delete if itemToDelete has more than one splitters
+//        return;
+//    } else if (splitters.count() == 1) {
+//        //move child splitter directly under the parent splitter.
+//        parent->addWidget(splitters.first());
+//    }
 
-    itemToDelete->deleteLater();
-}
+//    itemToDelete->deleteLater();
+//}
 
 void SplitterManager::onEmptyContainer() {
     TabWidgetContainer* container = static_cast<TabWidgetContainer*>(sender());

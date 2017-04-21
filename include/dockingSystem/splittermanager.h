@@ -14,7 +14,7 @@ public:
     void registerContainer(TabWidgetContainer* container);
     Splitter* createSplitter();
     void deleteSplitter(Splitter* splitter);
-    void deleteEmptySplitter(Splitter *itemToDelete);
+    //void deleteEmptySplitter(Splitter *itemToDelete);
 
     void splitTabWidget(int sourceTabIndex,
                         TabWidgetContainer* sourceContainer,
